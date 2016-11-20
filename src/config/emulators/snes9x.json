@@ -1,0 +1,4 @@
+{
+    "consoles": ["snes"],
+    "command": "{exe} -fullscreen {game}"
+}

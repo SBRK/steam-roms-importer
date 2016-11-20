@@ -1,0 +1,4 @@
+{
+    "consoles": ["n64"],
+    "command": "{exe} {game}"
+}

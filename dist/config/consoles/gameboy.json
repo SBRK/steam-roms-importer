@@ -1,0 +1,8 @@
+{
+    "name": "GameBoy",
+    "shortName": "GameBoy", 
+    "tags": ["GameBoy"],
+    "prefix": "[GameBoy]", 
+    "icon": "gameboy.png",
+    "extensions": ["gb", "gbc"]
+}

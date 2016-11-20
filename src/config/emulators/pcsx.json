@@ -1,0 +1,4 @@
+{
+    "consoles": ["psx"],
+    "command": "{exe} -nogui -cdfile {game}"
+}

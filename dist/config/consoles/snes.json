@@ -1,0 +1,8 @@
+{
+    "name": "Super NES",
+    "shortName": "SNES", 
+    "tags": ["SNES", "Nintendo"],
+    "prefix": "[SNES]", 
+    "icon": "snes.png",
+    "extensions": ["smc", "sfc", "zip"]
+}

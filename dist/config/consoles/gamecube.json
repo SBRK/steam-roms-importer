@@ -1,0 +1,8 @@
+{
+    "name": "GameCube",
+    "shortName": "GC", 
+    "tags": ["GameCube"],
+    "prefix": "[GameCube]", 
+    "icon": "gamecube.png",
+    "extensions": ["elf", "dol", "gcm", "iso", "gcz", "wad"]
+}

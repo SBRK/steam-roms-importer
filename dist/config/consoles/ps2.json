@@ -1,0 +1,8 @@
+{
+    "name": "PlayStation 2",
+    "shortName": "PS2", 
+    "tags": ["PS2"],
+    "prefix": "[PS2]", 
+    "icon": "ps2.png",
+    "extensions": ["iso", "bin"]
+}

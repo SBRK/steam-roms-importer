@@ -1,0 +1,8 @@
+{
+    "name": "Wii",
+    "shortName": "Wii", 
+    "tags": ["Wii"],
+    "prefix": "[Wii]", 
+    "icon": "wii.png",
+    "extensions": ["elf", "dol", "wbfs", "iso", "ciso", "wad"]
+}
