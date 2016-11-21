@@ -1,4 +1,5 @@
 {
     "consoles": ["gamecube", "wii"],
-    "command": "{exe} /e {game} /b"
+    "command": "{exe} /e {game} /b",
+    "exe": ""
 }

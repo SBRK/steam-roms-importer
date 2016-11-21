@@ -4,5 +4,7 @@
     "tags": ["NES"],
     "prefix": "[NES]", 
     "icon": "nes.png",
-    "extensions": ["nes", "nez"]
+    "extensions": ["nes", "nez"],
+    "romPaths": [],
+    "emulator": ""
 }

@@ -4,5 +4,7 @@
     "tags": ["N64"],
     "prefix": "[N64]", 
     "icon": "n64.png",
-    "extensions": ["z64", "n64", "zip"]
+    "extensions": ["z64", "n64", "zip"],
+    "romPaths": [],
+    "emulator": "project64"
 }

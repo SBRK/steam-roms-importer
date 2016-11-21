@@ -4,5 +4,7 @@
     "tags": ["GameBoy"],
     "prefix": "[GameBoy]", 
     "icon": "gameboy.png",
-    "extensions": ["gb", "gbc"]
+    "extensions": ["gb", "gbc"],
+    "romPaths": [],
+    "emulator": "vba"
 }

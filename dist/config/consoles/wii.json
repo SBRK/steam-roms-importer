@@ -4,5 +4,7 @@
     "tags": ["Wii"],
     "prefix": "[Wii]", 
     "icon": "wii.png",
-    "extensions": ["elf", "dol", "wbfs", "iso", "ciso", "wad"]
+    "extensions": ["elf", "dol", "wbfs", "iso", "ciso", "wad"],
+    "romPaths": [],
+    "emulator": "dolphin"
 }

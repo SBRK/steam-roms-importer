@@ -4,5 +4,7 @@
     "tags": ["SNES", "Nintendo"],
     "prefix": "[SNES]", 
     "icon": "snes.png",
-    "extensions": ["smc", "sfc", "zip"]
+    "extensions": ["smc", "sfc", "zip"],
+    "romPaths": [],
+    "emulator": "snes9x"
 }

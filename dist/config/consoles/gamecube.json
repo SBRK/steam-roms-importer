@@ -4,5 +4,7 @@
     "tags": ["GameCube"],
     "prefix": "[GameCube]", 
     "icon": "gamecube.png",
-    "extensions": ["elf", "dol", "gcm", "iso", "gcz", "wad"]
+    "extensions": ["elf", "dol", "gcm", "iso", "gcz", "wad"],
+    "romPaths": [],
+    "emulator": "dolphin"
 }

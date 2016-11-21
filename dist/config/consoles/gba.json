@@ -4,5 +4,7 @@
     "tags": ["GBA"],
     "prefix": "[GBA]", 
     "icon": "gba.png",
-    "extensions": ["gba"]
+    "extensions": ["gba"],
+    "romPaths": [],
+    "emulator": "vba"
 }

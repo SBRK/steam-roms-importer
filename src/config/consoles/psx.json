@@ -4,5 +4,7 @@
     "tags": ["PSX"],
     "prefix": "[PSX]", 
     "icon": "psx.png",
-    "extensions": ["iso", "bin", "img", "nrg"]
+    "extensions": ["iso", "bin", "img", "nrg"],
+    "romPaths": [],
+    "emulator": "pcsx"
 }

@@ -4,5 +4,7 @@
     "tags": ["PS2"],
     "prefix": "[PS2]", 
     "icon": "ps2.png",
-    "extensions": ["iso", "bin"]
+    "extensions": ["iso", "bin"],
+    "romPaths": [],
+    "emulator": ""
 }
