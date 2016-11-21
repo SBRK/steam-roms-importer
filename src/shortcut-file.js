@@ -6,6 +6,8 @@ import crc from 'crc';
 import {Uint64BE} from 'int64-buffer';
 import * as r from 'ramda';
 
+const defaultShortcutPath = 'steam-roms-importer';
+
 export default class ShortcutFile {
     constructor(filePath)
     {
@@ -21,12 +23,22 @@ export default class ShortcutFile {
 
         this.shortcuts = VDFParser.parse(data).toJSON();
 
-        this.shortcuts = r.map((s) => new Shortcut(s), this.shortcuts);
+        this.shortcuts = r.map(
+            (s) => new Shortcut(s), 
+            r.filter(
+                s => s.ShortcutPath != defaultShortcutPath && s.ShortcutPath != "totototo",
+                this.shortcuts)
+        );
+
+        console.log(this.shortcuts);
     }
 
     addShortcut(shortcut)
     {
         let s = new Shortcut(shortcut);
+
+        s.ShortcutPath = defaultShortcutPath;
+        s.custom = "toto";
 
         this.shortcuts.push(s);
         return s;

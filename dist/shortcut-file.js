@@ -28,6 +28,8 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var defaultShortcutPath = 'steam-roms-importer';
+
 var ShortcutFile = function () {
     function ShortcutFile(filePath) {
         _classCallCheck(this, ShortcutFile);
@@ -47,12 +49,19 @@ var ShortcutFile = function () {
 
             this.shortcuts = r.map(function (s) {
                 return new _nodeSteamShortcuts.Shortcut(s);
-            }, this.shortcuts);
+            }, r.filter(function (s) {
+                return s.ShortcutPath != defaultShortcutPath && s.ShortcutPath != "totototo";
+            }, this.shortcuts));
+
+            console.log(this.shortcuts);
         }
     }, {
         key: 'addShortcut',
         value: function addShortcut(shortcut) {
             var s = new _nodeSteamShortcuts.Shortcut(shortcut);
+
+            s.ShortcutPath = defaultShortcutPath;
+            s.custom = "toto";
 
             this.shortcuts.push(s);
             return s;
