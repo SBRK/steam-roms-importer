@@ -30,6 +30,8 @@ var shouldGameBeIgnored = function shouldGameBeIgnored(name) {
 };
 
 var Game = function Game(console, filePath) {
+    var gameConfig = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
     _classCallCheck(this, Game);
 
     this.console = console;
@@ -39,8 +41,12 @@ var Game = function Game(console, filePath) {
     this.name = _path2.default.basename(filePath, this.ext);
     this.cleanName = cleanRomName(this.name);
     this.exportToSteam = false;
+    this.grid = gameConfig.grid || "";
+    this.enabled = true;
 
-    this.ignore = shouldGameBeIgnored(this.cleanName);
+    if (gameConfig.enabled !== undefined && gameConfig.enabled === false) this.enabled = false;
+
+    this.ignore = !this.enabled || shouldGameBeIgnored(this.cleanName);
 };
 
 exports.default = Game;

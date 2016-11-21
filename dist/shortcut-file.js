@@ -50,7 +50,7 @@ var ShortcutFile = function () {
             this.shortcuts = r.map(function (s) {
                 return new _nodeSteamShortcuts.Shortcut(s);
             }, r.filter(function (s) {
-                return s.ShortcutPath != defaultShortcutPath && s.ShortcutPath != "totototo";
+                return s.ShortcutPath != defaultShortcutPath;
             }, this.shortcuts));
 
             console.log(this.shortcuts);

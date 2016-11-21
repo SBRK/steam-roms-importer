@@ -26,7 +26,7 @@ export default class ShortcutFile {
         this.shortcuts = r.map(
             (s) => new Shortcut(s), 
             r.filter(
-                s => s.ShortcutPath != defaultShortcutPath && s.ShortcutPath != "totototo",
+                s => s.ShortcutPath != defaultShortcutPath,
                 this.shortcuts)
         );
 

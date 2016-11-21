@@ -107,7 +107,7 @@ function loadConfigObject(name, objClass) {
                 var name = _path2.default.basename(file, '.json').toLowerCase();
                 file = _path2.default.join(userConfigPath, file);
 
-                if (result[name]) result[name].updateFromJsonFile(file);else result[name] = new objClass(file);
+                if (result[name]) result[name].updateFromUserJsonFile(file);else result[name] = new objClass(file);
             });
 
             return callback(null);

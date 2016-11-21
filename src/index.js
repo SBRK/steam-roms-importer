@@ -1,6 +1,6 @@
 import ShortcutFile from './shortcut-file';
 import {findGridImages} from './grid-provider';
-import {loadConfigObject} from './user-config';
+import {loadConfigObject, getUserConfigDirectory} from './user-config';
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
@@ -55,6 +55,7 @@ let generateShortcuts = (consoles, shortcutsFile) =>
 
     _.each(consoles, (gameConsole, name) =>
     {
+        gameConsole.searchGames();
         let emulator = gameConsole.getEmulator();
 
         if (!emulator)
@@ -133,19 +134,24 @@ let generateShortcuts = (consoles, shortcutsFile) =>
     );
 }
 
-loadConsoles().then(loadEmulators).then(({consoles, emulators}) =>
+getUserConfigDirectory().then((userConfigDir) =>
 {
-    _.each(emulators, (emulator, emulatorName) =>
-    {
-        _.each(emulator.consoles, (consoleName) =>
-        {
-            consoleName = consoleName.toLowerCase();
-            if (consoles[consoleName])
-                consoles[consoleName].addEmulator(emulatorName, emulator);
-        });
-    });
+    global.USER_CONFIG_DIR = userConfigDir;
 
-    loadShortcutsFile().then((shortcutsFile) => {
-        generateShortcuts(consoles, shortcutsFile);
+    loadConsoles().then(loadEmulators).then(({consoles, emulators}) =>
+    {
+        _.each(emulators, (emulator, emulatorName) =>
+        {
+            _.each(emulator.consoles, (consoleName) =>
+            {
+                consoleName = consoleName.toLowerCase();
+                if (consoles[consoleName])
+                    consoles[consoleName].addEmulator(emulatorName, emulator);
+            });
+        });
+
+        loadShortcutsFile().then((shortcutsFile) => {
+            generateShortcuts(consoles, shortcutsFile);
+        });
     });
 });

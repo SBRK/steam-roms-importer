@@ -2,11 +2,14 @@ import fs from 'fs';
 import path from 'path';
 import Game from './game';
 import _ from 'lodash';
+import {getUserConfigDirectory} from './user-config';
 
 export default class GameConsole {
     constructor(jsonFilePath)
     {
         let jsonData = JSON.parse(fs.readFileSync(jsonFilePath));
+
+        this.filePath = jsonFilePath;
 
         this.name = jsonData.name || '';
         this.shortName = jsonData.shortName || '';
@@ -17,6 +20,7 @@ export default class GameConsole {
         this.extensions = jsonData.extensions || [];
         this.emulators = {};
         this.emulator = jsonData.emulator || 0;
+        this.romsConfig = {};
 
         if (this.icon && this.icon.length)
         {
@@ -25,10 +29,10 @@ export default class GameConsole {
             this.icon = path.resolve(configPath, path.normalize(this.icon));
         }
 
-        this.searchGames();
+        this.loadRomsConfig();
     }
 
-    updateFromJsonFile(jsonFilePath)
+    updateFromUserJsonFile(jsonFilePath)
     {
         let jsonData = JSON.parse(fs.readFileSync(jsonFilePath));
         
@@ -47,8 +51,6 @@ export default class GameConsole {
 
             this.icon = path.resolve(configPath, path.normalize(this.icon));
         }
-
-        this.searchGames();
     }
 
     addEmulator(emulatorName, emulator)
@@ -67,6 +69,38 @@ export default class GameConsole {
             return this.emulators[emulatorNames[0]];
 
         return this.emulators[this.emulator];
+    }
+
+    loadRomsConfig()
+    {
+        let fileName = path.basename(this.filePath).replace('.json', '.roms');
+
+        let p = path.join(global.USER_CONFIG_DIR, 'consoles', fileName);
+
+        if (fs.existsSync(p))
+            this.romsConfig = JSON.parse(fs.readFileSync(p));
+    }
+
+    saveRomsConfig()
+    {
+        let fileName = path.basename(this.filePath).replace('.json', '.roms');
+
+        let p = path.join(global.USER_CONFIG_DIR, 'consoles', fileName);
+
+        if (_.keys(this.romsConfig).length)
+            fs.writeFileSync(p, JSON.stringify(this.romsConfig, null, 2));
+    }
+
+    getRomConfig(name)
+    {
+        let config = this.romsConfig[name] || {
+            enabled: true,
+            grid: ""
+        } 
+
+        this.romsConfig[name] = config;
+
+        return config;
     }
 
     searchGames()
@@ -88,10 +122,15 @@ export default class GameConsole {
                 let ext = path.extname(entry).replace(/^\./, '');
 
                 if (this.extensions.indexOf(ext) != -1)
-                    games.push(new Game(this, p));
+                {
+                    let gameConfig = this.getRomConfig(entry);                
+                    games.push(new Game(this, p, gameConfig));
+                }
             }
         }
 
         this.games = games;
+
+        this.saveRomsConfig();
     }
 }

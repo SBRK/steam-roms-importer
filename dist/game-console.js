@@ -22,6 +22,8 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
+var _userConfig = require('./user-config');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -32,6 +34,8 @@ var GameConsole = function () {
 
         var jsonData = JSON.parse(_fs2.default.readFileSync(jsonFilePath));
 
+        this.filePath = jsonFilePath;
+
         this.name = jsonData.name || '';
         this.shortName = jsonData.shortName || '';
         this.tags = jsonData.tags || [];
@@ -41,6 +45,7 @@ var GameConsole = function () {
         this.extensions = jsonData.extensions || [];
         this.emulators = {};
         this.emulator = jsonData.emulator || 0;
+        this.romsConfig = {};
 
         if (this.icon && this.icon.length) {
             var configPath = _path2.default.join(__dirname, 'config', 'icons');
@@ -48,12 +53,12 @@ var GameConsole = function () {
             this.icon = _path2.default.resolve(configPath, _path2.default.normalize(this.icon));
         }
 
-        this.searchGames();
+        this.loadRomsConfig();
     }
 
     _createClass(GameConsole, [{
-        key: 'updateFromJsonFile',
-        value: function updateFromJsonFile(jsonFilePath) {
+        key: 'updateFromUserJsonFile',
+        value: function updateFromUserJsonFile(jsonFilePath) {
             var jsonData = JSON.parse(_fs2.default.readFileSync(jsonFilePath));
 
             this.name = jsonData.name || this.name;
@@ -70,8 +75,6 @@ var GameConsole = function () {
 
                 this.icon = _path2.default.resolve(configPath, _path2.default.normalize(this.icon));
             }
-
-            this.searchGames();
         }
     }, {
         key: 'addEmulator',
@@ -88,6 +91,36 @@ var GameConsole = function () {
             if (!this.emulator) return this.emulators[emulatorNames[0]];
 
             return this.emulators[this.emulator];
+        }
+    }, {
+        key: 'loadRomsConfig',
+        value: function loadRomsConfig() {
+            var fileName = _path2.default.basename(this.filePath).replace('.json', '.roms');
+
+            var p = _path2.default.join(global.USER_CONFIG_DIR, 'consoles', fileName);
+
+            if (_fs2.default.existsSync(p)) this.romsConfig = JSON.parse(_fs2.default.readFileSync(p));
+        }
+    }, {
+        key: 'saveRomsConfig',
+        value: function saveRomsConfig() {
+            var fileName = _path2.default.basename(this.filePath).replace('.json', '.roms');
+
+            var p = _path2.default.join(global.USER_CONFIG_DIR, 'consoles', fileName);
+
+            if (_lodash2.default.keys(this.romsConfig).length) _fs2.default.writeFileSync(p, JSON.stringify(this.romsConfig, null, 2));
+        }
+    }, {
+        key: 'getRomConfig',
+        value: function getRomConfig(name) {
+            var config = this.romsConfig[name] || {
+                enabled: true,
+                grid: ""
+            };
+
+            this.romsConfig[name] = config;
+
+            return config;
         }
     }, {
         key: 'searchGames',
@@ -119,7 +152,10 @@ var GameConsole = function () {
 
                             var ext = _path2.default.extname(entry).replace(/^\./, '');
 
-                            if (this.extensions.indexOf(ext) != -1) games.push(new _game2.default(this, p));
+                            if (this.extensions.indexOf(ext) != -1) {
+                                var gameConfig = this.getRomConfig(entry);
+                                games.push(new _game2.default(this, p, gameConfig));
+                            }
                         }
                     } catch (err) {
                         _didIteratorError2 = true;
@@ -152,6 +188,8 @@ var GameConsole = function () {
             }
 
             this.games = games;
+
+            this.saveRomsConfig();
         }
     }]);
 

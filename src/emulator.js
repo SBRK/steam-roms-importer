@@ -12,7 +12,7 @@ export default class Emulator {
         this.command = jsonData.command || '{exe} {game}';
     }
 
-    updateFromJsonFile(jsonFilePath)
+    updateFromUserJsonFile(jsonFilePath)
     {
         let jsonData = JSON.parse(fs.readFileSync(jsonFilePath));
 

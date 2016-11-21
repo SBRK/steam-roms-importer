@@ -31,8 +31,8 @@ var Emulator = function () {
     }
 
     _createClass(Emulator, [{
-        key: 'updateFromJsonFile',
-        value: function updateFromJsonFile(jsonFilePath) {
+        key: 'updateFromUserJsonFile',
+        value: function updateFromUserJsonFile(jsonFilePath) {
             var jsonData = JSON.parse(_fs2.default.readFileSync(jsonFilePath));
 
             this.consoles = jsonData.consoles || this.consoles;

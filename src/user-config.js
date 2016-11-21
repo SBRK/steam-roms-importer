@@ -99,7 +99,7 @@ export function loadConfigObject(name, objClass)
                     file = path.join(userConfigPath, file);
 
                     if (result[name])
-                        result[name].updateFromJsonFile(file);
+                        result[name].updateFromUserJsonFile(file);
                     else
                         result[name] = new objClass(file);
                 });

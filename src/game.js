@@ -22,7 +22,7 @@ let shouldGameBeIgnored = (name) =>
 }
 
 export default class Game {
-    constructor(console, filePath)
+    constructor(console, filePath, gameConfig = {})
     {
         this.console = console;
         this.filePath = filePath;
@@ -31,7 +31,12 @@ export default class Game {
         this.name = path.basename(filePath, this.ext);
         this.cleanName = cleanRomName(this.name);
         this.exportToSteam = false;
+        this.grid = gameConfig.grid || "";
+        this.enabled = true;
 
-        this.ignore = shouldGameBeIgnored(this.cleanName); 
+        if (gameConfig.enabled !== undefined && gameConfig.enabled === false)
+            this.enabled = false;
+
+        this.ignore = !this.enabled || shouldGameBeIgnored(this.cleanName);
     }
 }

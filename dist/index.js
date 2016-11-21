@@ -82,6 +82,7 @@ var generateShortcuts = function generateShortcuts(consoles, shortcutsFile) {
     var grids = [];
 
     _lodash2.default.each(consoles, function (gameConsole, name) {
+        gameConsole.searchGames();
         var emulator = gameConsole.getEmulator();
 
         if (!emulator) return;
@@ -148,19 +149,23 @@ var generateShortcuts = function generateShortcuts(consoles, shortcutsFile) {
     });
 };
 
-loadConsoles().then(loadEmulators).then(function (_ref2) {
-    var consoles = _ref2.consoles,
-        emulators = _ref2.emulators;
+(0, _userConfig.getUserConfigDirectory)().then(function (userConfigDir) {
+    global.USER_CONFIG_DIR = userConfigDir;
 
-    _lodash2.default.each(emulators, function (emulator, emulatorName) {
-        _lodash2.default.each(emulator.consoles, function (consoleName) {
-            consoleName = consoleName.toLowerCase();
-            if (consoles[consoleName]) consoles[consoleName].addEmulator(emulatorName, emulator);
+    loadConsoles().then(loadEmulators).then(function (_ref2) {
+        var consoles = _ref2.consoles,
+            emulators = _ref2.emulators;
+
+        _lodash2.default.each(emulators, function (emulator, emulatorName) {
+            _lodash2.default.each(emulator.consoles, function (consoleName) {
+                consoleName = consoleName.toLowerCase();
+                if (consoles[consoleName]) consoles[consoleName].addEmulator(emulatorName, emulator);
+            });
         });
-    });
 
-    loadShortcutsFile().then(function (shortcutsFile) {
-        generateShortcuts(consoles, shortcutsFile);
+        loadShortcutsFile().then(function (shortcutsFile) {
+            generateShortcuts(consoles, shortcutsFile);
+        });
     });
 });
 //# sourceMappingURL=index.js.map
