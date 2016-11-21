@@ -96,13 +96,15 @@ var generateShortcuts = function generateShortcuts(consoles, shortcutsFile) {
 
             gameShortcut.appname = gameShortcut.appname.replace(/^ +/, '').replace(/ +$/, '');
 
-            var shortcut = shortcutsFile.addShortcut(gameShortcut);
+            if (!game.ignore) {
+                var shortcut = shortcutsFile.addShortcut(gameShortcut);
 
-            grids.push({
-                gameName: game.cleanName,
-                consoleName: gameConsole.name,
-                appid: shortcut.getAppID()
-            });
+                grids.push({
+                    gameName: game.cleanName,
+                    consoleName: gameConsole.name,
+                    appid: shortcut.getAppID()
+                });
+            }
         });
     });
 

@@ -71,13 +71,16 @@ let generateShortcuts = (consoles, shortcutsFile) =>
 
             gameShortcut.appname = gameShortcut.appname.replace(/^ +/, '').replace(/ +$/, '');
 
-            let shortcut = shortcutsFile.addShortcut(gameShortcut);
+            if (!game.ignore)
+            {
+                let shortcut = shortcutsFile.addShortcut(gameShortcut);
 
-            grids.push({
-                gameName: game.cleanName,
-                consoleName: gameConsole.name,
-                appid: shortcut.getAppID()
-            });
+                grids.push({
+                    gameName: game.cleanName,
+                    consoleName: gameConsole.name,
+                    appid: shortcut.getAppID()
+                });
+            }
         });
     });
 
