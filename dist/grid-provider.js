@@ -21,7 +21,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var searchSteamGridDB = function searchSteamGridDB(game, callback) {
     return new Promise(function (resolve, reject) {
         game = game.replace(/ - /gi, ': ').replace(/-/gi, ' ').replace(/CD {0,1}[0-9]/gi, '').replace(/ +/gi, ' ').replace(/ $/, '');
-        console.log(game);
         var url = 'http://www.steamgriddb.com/search.php?name=' + encodeURIComponent(game);
 
         _superagent2.default.get(url).set('Accept', 'application/json').end(function (err, res) {

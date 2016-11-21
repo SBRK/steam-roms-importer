@@ -6,7 +6,6 @@ let searchSteamGridDB = (game, callback) =>
     return new Promise((resolve, reject) =>
     {
         game = game.replace(/ - /gi, ': ').replace(/-/gi, ' ').replace(/CD {0,1}[0-9]/gi, '').replace(/ +/gi, ' ').replace(/ $/, '');
-        console.log(game);
         let url = `http://www.steamgriddb.com/search.php?name=${encodeURIComponent(game)}`;
 
         superagent
