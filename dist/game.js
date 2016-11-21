@@ -23,6 +23,12 @@ var cleanRomName = function cleanRomName(name) {
     return name;
 };
 
+var shouldGameBeIgnored = function shouldGameBeIgnored(name) {
+    if (name.match(/CD {0,1}[2-9]/)) return true;
+
+    return false;
+};
+
 var Game = function Game(console, filePath) {
     _classCallCheck(this, Game);
 
@@ -33,6 +39,8 @@ var Game = function Game(console, filePath) {
     this.name = _path2.default.basename(filePath, this.ext);
     this.cleanName = cleanRomName(this.name);
     this.exportToSteam = false;
+
+    this.ignore = shouldGameBeIgnored(this.cleanName);
 };
 
 exports.default = Game;

@@ -13,6 +13,14 @@ let cleanRomName = (name) =>
     return name;
 }
 
+let shouldGameBeIgnored = (name) =>
+{
+    if (name.match(/CD {0,1}[2-9]/))
+        return true;
+
+    return false;
+}
+
 export default class Game {
     constructor(console, filePath)
     {
@@ -23,5 +31,7 @@ export default class Game {
         this.name = path.basename(filePath, this.ext);
         this.cleanName = cleanRomName(this.name);
         this.exportToSteam = false;
+
+        this.ignore = shouldGameBeIgnored(this.cleanName); 
     }
 }
