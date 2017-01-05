@@ -1,5 +1,9 @@
 import async from 'async';
 import superagent from 'superagent';
+import path from 'path';
+import fs from 'fs';
+import http from 'http';
+import https from 'https';
 
 let searchSteamGridDB = (game, callback) =>
 {
@@ -97,7 +101,7 @@ let gridProviders = [
     searchConsoleGridDB
 ];
 
-export function findGridImages (game, console="")
+function findGridImage (game, console="")
 {
     return new Promise((resolve, reject) =>
     {
@@ -115,4 +119,58 @@ export function findGridImages (game, console="")
             }
         );
     });
+};
+
+export function findGridImages (games, steamConfigPath)
+{
+    async.mapSeries(
+        games, 
+        ({gameName, consoleName, appid}, callback) =>
+        {
+            let gridPath = path.join(steamConfigPath, 'grid');
+
+            if (!fs.existsSync(gridPath))
+                fs.mkdirSync(gridPath);
+
+            let filePath = path.join(gridPath, appid + '.png');
+
+            if (fs.existsSync(filePath))
+            {
+                console.warn(`Grid image for ${gameName} already exists, skipping.`);
+                return callback(null);
+            }
+
+            findGridImage(gameName, consoleName).then((images) => 
+            {
+                if (images && images.length)
+                {
+                    let url = images[0].image;
+                    let request = (url.indexOf('https:') != -1) ? https : http;
+
+                    try
+                    {
+                        request.get(url, (response) =>
+                        {
+                            let file = fs.createWriteStream(filePath);
+
+                            console.log('Found grid for ' + gameName);
+
+                            response.pipe(file)
+                            return callback(null);
+                        });
+                    }
+                    catch(e)
+                    {
+                        console.warn(`No grid image found for ${gameName}`);
+                        return callback(null);
+                    }
+                }
+                else
+                {
+                    console.warn(`No grid image found for ${gameName}`);
+                    return callback(null);
+                }
+            });
+        }
+    );
 }

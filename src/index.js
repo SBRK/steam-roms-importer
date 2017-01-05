@@ -2,8 +2,6 @@ import ShortcutFile from './shortcut-file';
 import {findGridImages} from './grid-provider';
 import {loadConfigObject, getUserConfigDirectory} from './user-config';
 import fs from 'fs';
-import http from 'http';
-import https from 'https';
 import os from 'os';
 import path from 'path';
 import async from 'async';
@@ -51,7 +49,7 @@ let loadShortcutsFile = () =>
 
 let generateShortcuts = (consoles, shortcutsFile) =>
 {
-    let grids = [];
+    let games = [];
 
     _.each(consoles, (gameConsole, name) =>
     {
@@ -76,7 +74,7 @@ let generateShortcuts = (consoles, shortcutsFile) =>
             {
                 let shortcut = shortcutsFile.addShortcut(gameShortcut);
 
-                grids.push({
+                games.push({
                     gameName: game.cleanName,
                     consoleName: gameConsole.name,
                     appid: shortcut.getAppID()
@@ -87,56 +85,7 @@ let generateShortcuts = (consoles, shortcutsFile) =>
 
     shortcutsFile.writeShortcuts();
 
-    async.mapSeries(
-        grids, 
-        ({gameName, consoleName, appid}, callback) =>
-        {
-            let gridPath = path.join(getSteamConfigPath(), 'grid');
-
-            if (!fs.existsSync(gridPath))
-                fs.mkdirSync(gridPath);
-
-            let filePath = path.join(gridPath, appid + '.png');
-
-            if (fs.existsSync(filePath))
-            {
-                console.warn(`Grid image for ${gameName} already exists, skipping.`);
-                return callback(null);
-            }
-
-            findGridImages(gameName, consoleName).then((images) => 
-            {
-                if (images && images.length)
-                {
-                    let url = images[0].image;
-                    let request = (url.indexOf('https:') != -1) ? https : http;
-
-                    try
-                    {
-                        request.get(url, (response) =>
-                        {
-                            let file = fs.createWriteStream(filePath);
-
-                            console.log('Found grid for ' + gameName);
-
-                            response.pipe(file)
-                            return callback(null);
-                        });
-                    }
-                    catch(e)
-                    {
-                        console.warn(`No grid image found for ${gameName}`);
-                        return callback(null);
-                    }
-                }
-                else
-                {
-                    console.log(`No grid image found for ${gameName}`);
-                    return callback(null);
-                }
-            });
-        }
-    );
+    findGridImages(games, getSteamConfigPath());
 }
 
 getUserConfigDirectory().then((userConfigDir) =>

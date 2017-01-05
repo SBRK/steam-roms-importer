@@ -12,14 +12,6 @@ var _fs = require('fs');
 
 var _fs2 = _interopRequireDefault(_fs);
 
-var _http = require('http');
-
-var _http2 = _interopRequireDefault(_http);
-
-var _https = require('https');
-
-var _https2 = _interopRequireDefault(_https);
-
 var _os = require('os');
 
 var _os2 = _interopRequireDefault(_os);
@@ -79,7 +71,7 @@ var loadShortcutsFile = function loadShortcutsFile() {
 };
 
 var generateShortcuts = function generateShortcuts(consoles, shortcutsFile) {
-    var grids = [];
+    var games = [];
 
     _lodash2.default.each(consoles, function (gameConsole, name) {
         gameConsole.searchGames();
@@ -100,7 +92,7 @@ var generateShortcuts = function generateShortcuts(consoles, shortcutsFile) {
             if (!game.ignore) {
                 var shortcut = shortcutsFile.addShortcut(gameShortcut);
 
-                grids.push({
+                games.push({
                     gameName: game.cleanName,
                     consoleName: gameConsole.name,
                     appid: shortcut.getAppID()
@@ -111,54 +103,15 @@ var generateShortcuts = function generateShortcuts(consoles, shortcutsFile) {
 
     shortcutsFile.writeShortcuts();
 
-    _async2.default.mapSeries(grids, function (_ref, callback) {
-        var gameName = _ref.gameName,
-            consoleName = _ref.consoleName,
-            appid = _ref.appid;
-
-        var gridPath = _path2.default.join(getSteamConfigPath(), 'grid');
-
-        if (!_fs2.default.existsSync(gridPath)) _fs2.default.mkdirSync(gridPath);
-
-        var filePath = _path2.default.join(gridPath, appid + '.png');
-
-        if (_fs2.default.existsSync(filePath)) {
-            console.warn('Grid image for ' + gameName + ' already exists, skipping.');
-            return callback(null);
-        }
-
-        (0, _gridProvider.findGridImages)(gameName, consoleName).then(function (images) {
-            if (images && images.length) {
-                var url = images[0].image;
-                var request = url.indexOf('https:') != -1 ? _https2.default : _http2.default;
-
-                try {
-                    request.get(url, function (response) {
-                        var file = _fs2.default.createWriteStream(filePath);
-
-                        console.log('Found grid for ' + gameName);
-
-                        response.pipe(file);
-                        return callback(null);
-                    });
-                } catch (e) {
-                    console.log('No grid image found for ' + gameName);
-                    return callback(null);
-                }
-            } else {
-                console.log('No grid image found for ' + gameName);
-                return callback(null);
-            }
-        });
-    });
+    (0, _gridProvider.findGridImages)(games, getSteamConfigPath());
 };
 
 (0, _userConfig.getUserConfigDirectory)().then(function (userConfigDir) {
     global.USER_CONFIG_DIR = userConfigDir;
 
-    loadConsoles().then(loadEmulators).then(function (_ref2) {
-        var consoles = _ref2.consoles,
-            emulators = _ref2.emulators;
+    loadConsoles().then(loadEmulators).then(function (_ref) {
+        var consoles = _ref.consoles,
+            emulators = _ref.emulators;
 
         _lodash2.default.each(emulators, function (emulator, emulatorName) {
             _lodash2.default.each(emulator.consoles, function (consoleName) {

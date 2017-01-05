@@ -16,6 +16,22 @@ var _superagent = require('superagent');
 
 var _superagent2 = _interopRequireDefault(_superagent);
 
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
+var _fs = require('fs');
+
+var _fs2 = _interopRequireDefault(_fs);
+
+var _http = require('http');
+
+var _http2 = _interopRequireDefault(_http);
+
+var _https = require('https');
+
+var _https2 = _interopRequireDefault(_https);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var searchSteamGridDB = function searchSteamGridDB(game, callback) {
@@ -133,7 +149,7 @@ var searchConsoleGridDB = function searchConsoleGridDB(game, console) {
 
 var gridProviders = [searchSteamGridDB, searchConsoleGridDB];
 
-function findGridImages(game) {
+function findGridImage(game) {
     var console = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
 
     return new Promise(function (resolve, reject) {
@@ -145,6 +161,49 @@ function findGridImages(game) {
             });
         }, function (error, images) {
             resolve(images);
+        });
+    });
+};
+
+function findGridImages(games, steamConfigPath) {
+    _async2.default.mapSeries(games, function (_ref, callback) {
+        var gameName = _ref.gameName,
+            consoleName = _ref.consoleName,
+            appid = _ref.appid;
+
+        var gridPath = _path2.default.join(steamConfigPath, 'grid');
+
+        if (!_fs2.default.existsSync(gridPath)) _fs2.default.mkdirSync(gridPath);
+
+        var filePath = _path2.default.join(gridPath, appid + '.png');
+
+        if (_fs2.default.existsSync(filePath)) {
+            console.warn('Grid image for ' + gameName + ' already exists, skipping.');
+            return callback(null);
+        }
+
+        findGridImage(gameName, consoleName).then(function (images) {
+            if (images && images.length) {
+                var url = images[0].image;
+                var request = url.indexOf('https:') != -1 ? _https2.default : _http2.default;
+
+                try {
+                    request.get(url, function (response) {
+                        var file = _fs2.default.createWriteStream(filePath);
+
+                        console.log('Found grid for ' + gameName);
+
+                        response.pipe(file);
+                        return callback(null);
+                    });
+                } catch (e) {
+                    console.warn('No grid image found for ' + gameName);
+                    return callback(null);
+                }
+            } else {
+                console.warn('No grid image found for ' + gameName);
+                return callback(null);
+            }
         });
     });
 }
