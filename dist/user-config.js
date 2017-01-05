@@ -26,6 +26,8 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
+var _util = require('./util');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function getUserConfigDirectory() {
@@ -39,7 +41,7 @@ function getUserConfigDirectory() {
             for (var i in items) {
                 if (items[i].name === 'Personal') {
                     (function () {
-                        var dir = _path2.default.join(items[i].value, 'steam-roms');
+                        var dir = (0, _util.resolveEnvPath)(_path2.default.join(items[i].value, 'steam-roms'));
 
                         if (!_fs2.default.existsSync(dir)) _fs2.default.mkdirSync(dir);
 

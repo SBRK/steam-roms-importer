@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import async from 'async';
 import _ from 'lodash';
+import {resolveEnvPath} from './util';
 
 export function getUserConfigDirectory()
 {
@@ -20,7 +21,7 @@ export function getUserConfigDirectory()
             {
                 if (items[i].name === 'Personal')
                 {
-                    let dir = path.join(items[i].value, 'steam-roms');
+                    let dir = resolveEnvPath(path.join(items[i].value, 'steam-roms'));
 
                     if (!fs.existsSync(dir))
                         fs.mkdirSync(dir);
