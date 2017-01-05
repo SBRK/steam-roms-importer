@@ -116,10 +116,14 @@ var generateShortcuts = function generateShortcuts(consoles, shortcutsFile) {
             consoleName = _ref.consoleName,
             appid = _ref.appid;
 
-        var filePath = _path2.default.join(getSteamConfigPath(), 'grid', appid + '.png');
+        var gridPath = _path2.default.join(getSteamConfigPath(), 'grid');
+
+        if (!_fs2.default.existsSync(gridPath)) _fs2.default.mkdirSync(gridPath);
+
+        var filePath = _path2.default.join(gridPath, appid + '.png');
 
         if (_fs2.default.existsSync(filePath)) {
-            console.log('Grid image for ' + gameName + ' already exists');
+            console.warn('Grid image for ' + gameName + ' already exists, skipping.');
             return callback(null);
         }
 
