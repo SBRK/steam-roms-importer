@@ -12,25 +12,35 @@ export default class ShortcutFile {
     constructor(filePath)
     {
         this.filePath = filePath;
-        this.shortcuts = {};
+        this.shortcuts = [];
 
         this._readFile();
     }
 
     _readFile()
     {
+        if (!fs.existsSync(this.filePath))
+            return;
+
         let data = fs.readFileSync(this.filePath);
 
-        this.shortcuts = VDFParser.parse(data).toJSON();
+        try
+        {
+            this.shortcuts = VDFParser.parse(data).toJSON();
 
-        this.shortcuts = r.map(
-            (s) => new Shortcut(s), 
-            r.filter(
-                s => s.ShortcutPath != defaultShortcutPath,
-                this.shortcuts)
-        );
+            this.shortcuts = r.map(
+                (s) => new Shortcut(s), 
+                r.filter(
+                    s => s.ShortcutPath != defaultShortcutPath,
+                    this.shortcuts)
+            );
 
-        console.log(this.shortcuts);
+            console.log(this.shortcuts);
+        }
+        catch(e)
+        {
+            console.error(e);
+        }
     }
 
     addShortcut(shortcut)

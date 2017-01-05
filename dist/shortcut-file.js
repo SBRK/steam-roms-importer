@@ -35,7 +35,7 @@ var ShortcutFile = function () {
         _classCallCheck(this, ShortcutFile);
 
         this.filePath = filePath;
-        this.shortcuts = {};
+        this.shortcuts = [];
 
         this._readFile();
     }
@@ -43,17 +43,23 @@ var ShortcutFile = function () {
     _createClass(ShortcutFile, [{
         key: '_readFile',
         value: function _readFile() {
+            if (!fs.existsSync(this.filePath)) return;
+
             var data = fs.readFileSync(this.filePath);
 
-            this.shortcuts = _nodeSteamShortcuts.Parser.parse(data).toJSON();
+            try {
+                this.shortcuts = _nodeSteamShortcuts.Parser.parse(data).toJSON();
 
-            this.shortcuts = r.map(function (s) {
-                return new _nodeSteamShortcuts.Shortcut(s);
-            }, r.filter(function (s) {
-                return s.ShortcutPath != defaultShortcutPath;
-            }, this.shortcuts));
+                this.shortcuts = r.map(function (s) {
+                    return new _nodeSteamShortcuts.Shortcut(s);
+                }, r.filter(function (s) {
+                    return s.ShortcutPath != defaultShortcutPath;
+                }, this.shortcuts));
 
-            console.log(this.shortcuts);
+                console.log(this.shortcuts);
+            } catch (e) {
+                console.error(e);
+            }
         }
     }, {
         key: 'addShortcut',
