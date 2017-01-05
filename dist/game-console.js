@@ -135,7 +135,13 @@ var GameConsole = function () {
                 for (var _iterator = this.romPaths[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                     var dir = _step.value;
 
-                    var entries = _fs2.default.readdirSync(_path2.default.normalize(dir));
+                    dir = _path2.default.normalize(dir);
+                    if (!_fs2.default.existsSync(dir)) {
+                        console.error('Directory does not exist: ' + dir);
+                        continue;
+                    }
+
+                    var entries = _fs2.default.readdirSync(dir);
 
                     var _iteratorNormalCompletion2 = true;
                     var _didIteratorError2 = false;

@@ -109,7 +109,14 @@ export default class GameConsole {
 
         for (let dir of this.romPaths)
         {
-            let entries = fs.readdirSync(path.normalize(dir));
+            dir = path.normalize(dir);
+            if (!fs.existsSync(dir))
+            {
+                console.error('Directory does not exist: ' + dir);
+                continue;
+            }
+            
+            let entries = fs.readdirSync(dir);
             
             for (let entry of entries)
             {
