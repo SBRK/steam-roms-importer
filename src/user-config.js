@@ -90,6 +90,14 @@ export function loadConfigObject(name, objClass)
                 if (!fs.existsSync(userConfigPath))
                     fs.mkdirSync(userConfigPath);
 
+                for (let name in result)
+                {
+                    let p = path.join(userConfigPath, name + '.json');
+
+                    if (!fs.existsSync(p))
+                        result[name].generateUserJsonFile(p);
+                }
+
                 listFiles(userConfigPath, ['json']).then((jsonFiles) => callback(null, jsonFiles));
             },
             (jsonFiles, callback) =>

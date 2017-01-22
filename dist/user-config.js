@@ -101,6 +101,12 @@ function loadConfigObject(name, objClass) {
 
             if (!_fs2.default.existsSync(userConfigPath)) _fs2.default.mkdirSync(userConfigPath);
 
+            for (var _name in result) {
+                var p = _path2.default.join(userConfigPath, _name + '.json');
+
+                if (!_fs2.default.existsSync(p)) result[_name].generateUserJsonFile(p);
+            }
+
             listFiles(userConfigPath, ['json']).then(function (jsonFiles) {
                 return callback(null, jsonFiles);
             });

@@ -77,6 +77,24 @@ var GameConsole = function () {
             }
         }
     }, {
+        key: 'generateUserJsonFile',
+        value: function generateUserJsonFile(jsonFilePath) {
+            var content = {
+                name: this.name,
+                romPaths: [],
+                emulator: "",
+                tags: this.tags,
+                prefix: this.prefix,
+                extensions: this.extensions
+            };
+
+            var contentJsonString = JSON.stringify(content, null, 4);
+
+            _fs2.default.writeFileSync(jsonFilePath, contentJsonString);
+
+            console.log('Generated user config file for console ' + this.name + ' at ' + jsonFilePath);
+        }
+    }, {
         key: 'addEmulator',
         value: function addEmulator(emulatorName, emulator) {
             this.emulators[emulatorName] = emulator;

@@ -55,8 +55,6 @@ var ShortcutFile = function () {
                 }, r.filter(function (s) {
                     return s.ShortcutPath != defaultShortcutPath;
                 }, this.shortcuts));
-
-                console.log(this.shortcuts);
             } catch (e) {
                 console.error(e);
             }
@@ -67,7 +65,6 @@ var ShortcutFile = function () {
             var s = new _nodeSteamShortcuts.Shortcut(shortcut);
 
             s.ShortcutPath = defaultShortcutPath;
-            s.custom = "toto";
 
             this.shortcuts.push(s);
             return s;

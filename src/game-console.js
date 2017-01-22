@@ -53,6 +53,24 @@ export default class GameConsole {
         }
     }
 
+    generateUserJsonFile(jsonFilePath)
+    {
+        var content = {
+            name: this.name,
+            romPaths: [],
+            emulator: "",
+            tags: this.tags,
+            prefix: this.prefix,
+            extensions: this.extensions
+        }
+
+        var contentJsonString = JSON.stringify(content, null, 4);
+
+        fs.writeFileSync(jsonFilePath, contentJsonString);
+
+        console.log(`Generated user config file for console ${this.name} at ${jsonFilePath}`);
+    }
+
     addEmulator(emulatorName, emulator)
     {
         this.emulators[emulatorName] = emulator;

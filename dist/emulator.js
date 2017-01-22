@@ -24,9 +24,11 @@ var Emulator = function () {
 
         var jsonData = JSON.parse(_fs2.default.readFileSync(jsonFilePath));
 
+        this.name = _path2.default.basename(jsonFilePath, _path2.default.extname(jsonFilePath));
+
         this.consoles = jsonData.consoles || [];
 
-        this.exe = _path2.default.normalize(jsonData.exe || '');
+        this.exe = jsonData.exe ? _path2.default.normalize(jsonData.exe) : '';
         this.command = jsonData.command || '{exe} {game}';
     }
 
@@ -39,6 +41,21 @@ var Emulator = function () {
 
             this.exe = _path2.default.normalize(jsonData.exe || this.exe);
             this.command = jsonData.command || this.command;
+        }
+    }, {
+        key: 'generateUserJsonFile',
+        value: function generateUserJsonFile(jsonFilePath) {
+            var content = {
+                exe: this.exe,
+                command: this.command,
+                consoles: this.consoles
+            };
+
+            var contentJsonString = JSON.stringify(content, null, 4);
+
+            _fs2.default.writeFileSync(jsonFilePath, contentJsonString);
+
+            console.log('Generated user config file for emulator ' + this.name + ' at ' + jsonFilePath);
         }
     }, {
         key: 'getCommandForGame',

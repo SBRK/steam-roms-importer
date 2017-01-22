@@ -34,8 +34,6 @@ export default class ShortcutFile {
                     s => s.ShortcutPath != defaultShortcutPath,
                     this.shortcuts)
             );
-
-            console.log(this.shortcuts);
         }
         catch(e)
         {
@@ -48,7 +46,6 @@ export default class ShortcutFile {
         let s = new Shortcut(shortcut);
 
         s.ShortcutPath = defaultShortcutPath;
-        s.custom = "toto";
 
         this.shortcuts.push(s);
         return s;
