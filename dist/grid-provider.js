@@ -165,11 +165,14 @@ function findGridImage(game) {
     });
 };
 
-function findGridImages(games, steamConfigPath) {
-    _async2.default.mapSeries(games, function (_ref, callback) {
-        var gameName = _ref.gameName,
-            consoleName = _ref.consoleName,
-            appid = _ref.appid;
+function findGridImages(_ref, callback) {
+    var games = _ref.games,
+        steamConfigPath = _ref.steamConfigPath;
+
+    _async2.default.mapSeries(games, function (_ref2, callback) {
+        var gameName = _ref2.gameName,
+            consoleName = _ref2.consoleName,
+            appid = _ref2.appid;
 
         var gridPath = _path2.default.join(steamConfigPath, 'grid');
 
@@ -183,6 +186,8 @@ function findGridImages(games, steamConfigPath) {
         }
 
         findGridImage(gameName, consoleName).then(function (images) {
+            if (timedOut) return;
+
             if (images && images.length) {
                 var url = images[0].image;
                 var request = url.indexOf('https:') != -1 ? _https2.default : _http2.default;
@@ -204,7 +209,11 @@ function findGridImages(games, steamConfigPath) {
                 console.warn('No grid image found for ' + gameName);
                 return callback(null);
             }
+
+            console.log('nope');
         });
+    }, function (error) {
+        callback(error);
     });
 }
 //# sourceMappingURL=grid-provider.js.map

@@ -65,7 +65,7 @@ var listFiles = function listFiles(p, exts) {
     return new Promise(function (resolve, reject) {
         _fs2.default.readdir(p, function (err, entries) {
             var filteredFiles = entries.filter(function (entry) {
-                return exts.indexOf(_path2.default.extname(entry).replace(/^\./, '') != -1);
+                return exts.indexOf(_path2.default.extname(entry).replace(/^\./, '')) != -1;
             });
 
             resolve(filteredFiles);

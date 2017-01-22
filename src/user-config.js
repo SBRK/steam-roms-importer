@@ -51,7 +51,7 @@ let listFiles = (p, exts) =>
         {
             let filteredFiles = entries.filter((entry) => 
             {
-                return exts.indexOf(path.extname(entry).replace(/^\./, '') != -1);
+                return exts.indexOf(path.extname(entry).replace(/^\./, '')) != -1;
             });
 
             resolve(filteredFiles);

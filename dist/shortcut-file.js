@@ -74,10 +74,12 @@ var ShortcutFile = function () {
         }
     }, {
         key: 'writeShortcuts',
-        value: function writeShortcuts() {
+        value: function writeShortcuts(callback) {
             var data = _nodeSteamShortcuts.Builder.build(this.shortcuts);
 
-            fs.writeFile(this.filePath, data);
+            fs.writeFile(this.filePath, data, function (error) {
+                return callback(error);
+            });
         }
     }]);
 

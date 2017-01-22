@@ -103,6 +103,19 @@ export default class GameConsole {
         return config;
     }
 
+    toObject()
+    {
+        return {
+            name: this.name,
+            shortName: this.shortName,
+            tags: this.tags,
+            prefix: this.prefix,
+            icon: this.icon,
+            romPaths: this.romPaths,
+            extensions: this.extensions
+        };
+    }
+
     searchGames()
     {
         let games = [];

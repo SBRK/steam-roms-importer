@@ -54,10 +54,10 @@ export default class ShortcutFile {
         return s;
     }
 
-    writeShortcuts()
+    writeShortcuts(callback)
     {
         var data = VDFBuilder.build(this.shortcuts);
 
-        fs.writeFile(this.filePath, data);
+        fs.writeFile(this.filePath, data, (error) => callback(error));
     }
 }

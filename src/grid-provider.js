@@ -121,7 +121,7 @@ function findGridImage (game, console="")
     });
 };
 
-export function findGridImages (games, steamConfigPath)
+export function findGridImages ({games, steamConfigPath}, callback)
 {
     async.mapSeries(
         games, 
@@ -142,6 +142,9 @@ export function findGridImages (games, steamConfigPath)
 
             findGridImage(gameName, consoleName).then((images) => 
             {
+                if (timedOut)
+                    return;
+
                 if (images && images.length)
                 {
                     let url = images[0].image;
@@ -170,7 +173,13 @@ export function findGridImages (games, steamConfigPath)
                     console.warn(`No grid image found for ${gameName}`);
                     return callback(null);
                 }
+
+                console.log('nope');
             });
+        },
+        (error) =>
+        {
+            callback(error);
         }
     );
 }

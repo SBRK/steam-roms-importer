@@ -123,6 +123,19 @@ var GameConsole = function () {
             return config;
         }
     }, {
+        key: 'toObject',
+        value: function toObject() {
+            return {
+                name: this.name,
+                shortName: this.shortName,
+                tags: this.tags,
+                prefix: this.prefix,
+                icon: this.icon,
+                romPaths: this.romPaths,
+                extensions: this.extensions
+            };
+        }
+    }, {
         key: 'searchGames',
         value: function searchGames() {
             var games = [];
