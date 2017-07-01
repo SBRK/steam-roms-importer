@@ -5,8 +5,7 @@ import { getSteamConfigPath, loadShortcutsFile, generateShortcuts } from './serv
 import { findGridImages } from './service/grid-provider';
 
 process.on('unhandledRejection', function(reason, p){
-    console.log("Possibly Unhandled Rejection at: Promise ", p, " reason: ", reason);
-    // application specific logging here
+    console.log("Unhandled Rejection at: Promise ", p, " reason: ", reason);
 });
 
 async function main() {
@@ -21,11 +20,4 @@ async function main() {
     console.log('All done !');
 }
 
-try
-{
-    main()
-}
-catch (error)
-{
-    console.error(error)
-}
+main()
