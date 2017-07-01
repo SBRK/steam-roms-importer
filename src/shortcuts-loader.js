@@ -3,16 +3,14 @@ import ShortcutFile from './shortcut-file';
 import fs from 'fs';
 import path from 'path';
 
-import _ from 'lodash';
-
 export function getSteamConfigPath()
 {
-    let users = fs.readdirSync("C:/Program Files (x86)/Steam/userdata/");
+    let users = fs.readdirSync('C:/Program Files (x86)/Steam/userdata/');
 
     if (!users || !users.length)
         console.error('No steam directory found !');
 
-    let filePath = "C:/Program Files (x86)/Steam/userdata/" + users[0] + "/config";
+    let filePath = `C:/Program Files (x86)/Steam/userdata/${users[0]}/config`;
 
     return filePath;
 }
@@ -29,19 +27,21 @@ export function loadShortcutsFile()
     });
 }
 
-export function generateShortcuts({consoles, shortcutsFile}, callback)
+export async function generateShortcuts({consoles, shortcutsFile})
 {
     let games = [];
 
-    _.each(consoles, (gameConsole, name) =>
+    for (const consoleName in consoles)
     {
+        const gameConsole = consoles[consoleName]
+
         gameConsole.searchGames();
         let emulator = gameConsole.getEmulator();
 
         if (!emulator)
-            return;
+            continue;
 
-        _.each(gameConsole.games, (game) =>
+        for(const game of gameConsole.games)
         {
             let gameShortcut = {
                 appname: gameConsole.prefix + ' ' + game.cleanName,
@@ -62,8 +62,17 @@ export function generateShortcuts({consoles, shortcutsFile}, callback)
                     appid: shortcut.getAppID()
                 });
             }
-        });
-    });
+        }
+    }
 
-    shortcutsFile.writeShortcuts((error) => callback(error, error ? [] : games));
+    try
+    {
+        await shortcutsFile.writeShortcuts();
+    }
+    catch (error)
+    {
+        throw(error)
+    }
+
+    return games;
 }

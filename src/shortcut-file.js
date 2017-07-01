@@ -1,5 +1,3 @@
-"use strict";
-
 import * as fs from 'fs';
 import {Parser as VDFParser, Builder as VDFBuilder, Shortcut} from 'node-steam-shortcuts';
 import crc from 'crc';
@@ -29,7 +27,7 @@ export default class ShortcutFile {
             this.shortcuts = VDFParser.parse(data).toJSON();
 
             this.shortcuts = r.map(
-                (s) => new Shortcut(s), 
+                (s) => new Shortcut(s),
                 r.filter(
                     s => s.ShortcutPath != defaultShortcutPath,
                     this.shortcuts)
@@ -51,10 +49,16 @@ export default class ShortcutFile {
         return s;
     }
 
-    writeShortcuts(callback)
+    async writeShortcuts()
     {
-        var data = VDFBuilder.build(this.shortcuts);
+        const self = this
+        return new Promise(function(resolve, reject) {
+            var data = VDFBuilder.build(self.shortcuts);
 
-        fs.writeFile(this.filePath, data, (error) => callback(error));
+            fs.writeFile(self.filePath, data, (error) => {
+                if (error) return reject(error);
+                return resolve();
+            });
+        });
     }
 }

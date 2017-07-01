@@ -1,99 +1,110 @@
-import async from 'async';
 import superagent from 'superagent';
 import path from 'path';
 import fs from 'fs';
-import http from 'http';
-import https from 'https';
+import request from 'request'
 
-let searchSteamGridDB = (game, callback) =>
+let searchSteamGridDB = async (game) =>
 {
-    return new Promise((resolve, reject) =>
-    {
-        game = game.replace(/ - /gi, ': ').replace(/-/gi, ' ').replace(/CD {0,1}[0-9]/gi, '').replace(/ +/gi, ' ').replace(/ $/, '');
-        let url = `http://www.steamgriddb.com/search.php?name=${encodeURIComponent(game)}`;
+    game = game.replace(/ - /gi, ': ').replace(/-/gi, ' ').replace(/CD {0,1}[0-9]/gi, '').replace(/ +/gi, ' ').replace(/ $/, '');
+    let url = `http://www.steamgriddb.com/search.php?name=${encodeURIComponent(game)}`;
 
-        superagent
+    let error, response
+
+    try
+    {
+        response = await superagent
             .get(url)
             .set('Accept', 'application/json')
-            .end((err, res) =>
-            {
-                if (err || !res.ok) 
-                    return reject({message: 'could not get '});
+    }
+    catch (e)
+    {
+        error = e
+    }
 
-                let images = [];
-                let data = JSON.parse(res.text);
+    if (error || !response.ok)
+    {
+        throw(new Error(`could not get ${url}`));
+    }
 
-                for (let d of data)
-                {
-                    if (!(typeof d === 'object'))
-                        continue;
+    let images = [];
+    let data = JSON.parse(response.text);
 
-                    if (d['grid_link'])
-                        images.push({
-                            image: d['grid_link'],
-                            thumbnail: d['thumbnail_link']
-                        });
-                }
+    for (let d of data)
+    {
+        if (!(typeof d === 'object'))
+            continue;
 
-                return resolve(images);
-            });
-    });
+        if (d['grid_link'])
+        {
+            images.push({
+                image: d['grid_link'],
+                thumbnail: d['thumbnail_link']
+           });
+        }
+    }
+
+    return images;
 }
 
-let searchConsoleGridDB = (game, console) =>
+let searchConsoleGridDB = async (game, console) =>
 {
-    return new Promise((resolve, reject) =>
+    let shortCodes = {
+        'N64': ['NINTENDO64'],
+        'SNES': ['SUPERNES', 'SUPERNINTENDO', 'SUPERFAMICOM', 'SFC', 'SFM'],
+        'NES': ['NES', 'FAMICOM', 'NINTENDO', 'NINTENDOENTERTAINMENTSYSTEM'],
+        'GAMEBOY': ['GB', 'NINTENDOGAMEBOY', 'NINTENDOGB', 'NGB', 'GAMEBOYCOLOR', 'GBC', 'NINTENDOGAMEBOYCOLOR', 'NINTENDOGBC', 'NGBC', 'SUPERGAMEBOY', 'SGB', 'NINTENDOSUPERGAMEBOY', 'NINTENDOSGB', 'NSGB'],
+        'GAMECUBE': ['GC', 'NGC', 'NINTENDOGC', 'NINTENDOGAMECUBE', 'DOLPHIN', 'NINTENDODOLPHIN'],
+        'WII': ['NINTENDOWII'],
+        'GBA': ['GAMEBOYADVANCE', 'GAMEBOYADVANCESP', 'NINTENDOGBA', 'GBADVANCE', 'NINTENDOGBADVANCE', 'GBAM', 'GBASP', 'GAMEBOYADVANCEMICRO', 'GBAMICRO'],
+        'DS': ['NINTENDODS', 'NDS', 'DUALSCREEN', 'NINTENDODUALSCREEN', 'DSLITE', 'DSI', 'DSILITE', 'NINTENDODSLITE'],
+        'PS1': ['PLAYSTATION', 'SONYPLAYSTATION', 'PSX', 'PS', 'SONYPSX']
+    }
+
+    let findShortCode = (console) =>
     {
-        let shortCodes = {
-            'N64': ['NINTENDO64'],
-            'SNES': ['SUPERNES', 'SUPERNINTENDO', 'SUPERFAMICOM', 'SFC', 'SFM'],
-            'NES': ['NES', 'FAMICOM', 'NINTENDO', 'NINTENDOENTERTAINMENTSYSTEM'],
-            'GAMEBOY': ['GB', 'NINTENDOGAMEBOY', 'NINTENDOGB', 'NGB', 'GAMEBOYCOLOR', 'GBC', 'NINTENDOGAMEBOYCOLOR', 'NINTENDOGBC', 'NGBC', 'SUPERGAMEBOY', 'SGB', 'NINTENDOSUPERGAMEBOY', 'NINTENDOSGB', 'NSGB'],
-            'GAMECUBE': ['GC', 'NGC', 'NINTENDOGC', 'NINTENDOGAMECUBE', 'DOLPHIN', 'NINTENDODOLPHIN'],
-            'WII': ['NINTENDOWII'],
-            'GBA': ['GAMEBOYADVANCE', 'GAMEBOYADVANCESP', 'NINTENDOGBA', 'GBADVANCE', 'NINTENDOGBADVANCE', 'GBAM', 'GBASP', 'GAMEBOYADVANCEMICRO', 'GBAMICRO'],
-            'DS': ['NINTENDODS', 'NDS', 'DUALSCREEN', 'NINTENDODUALSCREEN', 'DSLITE', 'DSI', 'DSILITE', 'NINTENDODSLITE'],
-            'PS1': ['PLAYSTATION', 'SONYPLAYSTATION', 'PSX', 'PS', 'SONYPSX']
-        }
+        let c = console.replace(/\s/g, '').toUpperCase();
 
-        let findShortCode = (console) =>
+        for (let shortCode in shortCodes)
         {
-            let c = console.replace(/\s/g, '').toUpperCase();
-
-            for (let shortCode in shortCodes)
-            {
-                if (shortCodes[shortCode].indexOf(c) != -1)
-                    return shortCode;
-            }
-
-            return console;
+            if (shortCodes[shortCode].indexOf(c) != -1)
+                return shortCode;
         }
 
-        game = game.replace('-', ' ').replace(/CD {0-1}[0-9]/gi, '').replace(/ +/gi, ' ').replace(/ $/, '');
+        return console;
+    }
 
-        let url = `http://consolegrid.com/api/top_picture?console=${findShortCode(console)}&game=${encodeURIComponent(game)}`;
+    game = game.replace('-', ' ').replace(/CD {0-1}[0-9]/gi, '').replace(/ +/gi, ' ').replace(/ $/, '');
 
-        superagent
-            .get(url)
-            .end((err, res) =>
-            {
-                if (err || !res.ok) 
-                    return reject({message: 'could not get anything from consolegrid'});
+    let url = `http://consolegrid.com/api/top_picture?console=${findShortCode(console)}&game=${encodeURIComponent(game)}`;
 
-                let images = [];
-                let data = res.text.split('\n');
+    let error, response
 
-                for (let d of data)
-                {
-                    images.push({
-                        image: d,
-                        thumbnail: d
-                    });
-                }
+    try
+    {
+        response = await superagent.get(url)
+    }
+    catch (e)
+    {
+        error = e
+    }
 
-                return resolve(images);
-            });
-    });
+    if (error || !response.ok)
+    {
+        throw(new Error(`could not get ${url}`));
+    }
+
+    let images = [];
+    let data = response.text.split('\n');
+
+    for (let d of data)
+    {
+        images.push({
+            image: d,
+            thumbnail: d
+        });
+    }
+
+    return images;
 }
 
 let gridProviders = [
@@ -101,85 +112,64 @@ let gridProviders = [
     searchConsoleGridDB
 ];
 
-function findGridImage (game, console="")
+async function findGridImage (game, console='')
 {
-    return new Promise((resolve, reject) =>
+    let images = []
+
+    for (const searchFunction of gridProviders)
     {
-        async.concat(
-            gridProviders, 
-            (searchFunction, callback) =>
-            {
-                searchFunction(game, console)
-                    .then((images) => callback(null, images))
-                    .catch((e) => callback(null, []));
-            },
-            (error, images) =>
-            {
-                resolve(images);
-            }
-        );
-    });
+        try
+        {
+            const foundImages = await searchFunction(game, console);
+            images = images.concat(foundImages);
+        }
+        catch (e)
+        {
+            continue;
+        }
+    }
+
+    return images;
 };
 
-export function findGridImages ({games, steamConfigPath}, callback)
+export async function findGridImages ({games, steamConfigPath})
 {
-    async.mapSeries(
-        games, 
-        ({gameName, consoleName, appid}, callback) =>
+    for (const game of games)
+    {
+        const {gameName, consoleName, appid} = game;
+
+        let gridPath = path.join(steamConfigPath, 'grid');
+
+        if (!fs.existsSync(gridPath))
+            fs.mkdirSync(gridPath);
+
+        let filePath = path.join(gridPath, appid + '.png');
+
+        if (fs.existsSync(filePath))
         {
-            let gridPath = path.join(steamConfigPath, 'grid');
-
-            if (!fs.existsSync(gridPath))
-                fs.mkdirSync(gridPath);
-
-            let filePath = path.join(gridPath, appid + '.png');
-
-            if (fs.existsSync(filePath))
-            {
-                console.warn(`Grid image for ${gameName} already exists, skipping.`);
-                return callback(null);
-            }
-
-            findGridImage(gameName, consoleName).then((images) => 
-            {
-                if (timedOut)
-                    return;
-
-                if (images && images.length)
-                {
-                    let url = images[0].image;
-                    let request = (url.indexOf('https:') != -1) ? https : http;
-
-                    try
-                    {
-                        request.get(url, (response) =>
-                        {
-                            let file = fs.createWriteStream(filePath);
-
-                            console.log('Found grid for ' + gameName);
-
-                            response.pipe(file)
-                            return callback(null);
-                        });
-                    }
-                    catch(e)
-                    {
-                        console.warn(`No grid image found for ${gameName}`);
-                        return callback(null);
-                    }
-                }
-                else
-                {
-                    console.warn(`No grid image found for ${gameName}`);
-                    return callback(null);
-                }
-
-                console.log('nope');
-            });
-        },
-        (error) =>
-        {
-            callback(error);
+            console.warn(`Grid image for ${gameName} already exists, skipping.`);
+            continue;
         }
-    );
+
+        const images = await findGridImage(gameName, consoleName)
+
+        if (images && images.length)
+        {
+            try
+            {
+                const response = await request.get(images[0].image)
+                console.log('Found grid for ' + gameName);
+
+                response.pipe(fs.createWriteStream(filePath))
+            }
+            catch(e)
+            {
+                console.warn(`No grid image found for ${gameName}`);
+            }
+        }
+        else
+        {
+            console.warn(`No grid image found for ${gameName}`);
+        }
+    }
 }

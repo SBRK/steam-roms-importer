@@ -1,8 +1,7 @@
 import Winreg from 'winreg';
 import path from 'path';
 import fs from 'fs';
-import async from 'async';
-import _ from 'lodash';
+import each from 'lodash/each';
 import {resolveEnvPath} from './util';
 
 export function getUserConfigDirectory()
@@ -12,7 +11,7 @@ export function getUserConfigDirectory()
         var regKey = new Winreg(
         {
             hive: Winreg.HKCU,
-            key: '\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders' 
+            key: '\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders'
         });
 
         var myDocFolder = regKey.values((err, items) =>
@@ -28,7 +27,7 @@ export function getUserConfigDirectory()
 
                     let subFolders = ['consoles', 'emulators', 'icons'];
 
-                    _.each(subFolders, (subFolder) =>
+                    each(subFolders, (subFolder) =>
                     {
                         let subFolderPath = path.join(dir, subFolder);
 
@@ -49,7 +48,7 @@ let listFiles = (p, exts) =>
     {
         fs.readdir(p, (err, entries) =>
         {
-            let filteredFiles = entries.filter((entry) => 
+            let filteredFiles = entries.filter((entry) =>
             {
                 return exts.indexOf(path.extname(entry).replace(/^\./, '')) != -1;
             });
@@ -59,67 +58,47 @@ let listFiles = (p, exts) =>
     });
 }
 
-export function loadConfigObject(name, objClass)
+export async function loadConfigObject(name, objClass)
 {
-    return new Promise((resolve, reject) =>
+    let result = {};
+    let configPath = path.join(__dirname, 'config', name);
+    let userConfigPath = ''
+
+    const jsonFiles = await listFiles(configPath, ['json']);
+
+    each(jsonFiles, (file) =>
     {
-        let result = {};
-        let configPath = path.join(__dirname, "config", name);
-        let userConfigPath = ''
+        let name = path.basename(file, '.json').toLowerCase();
+        file = path.join(configPath, file);
 
-        async.waterfall(
-        [
-            (callback) => listFiles(configPath, ['json']).then((jsonFiles) => callback(null, jsonFiles)),
-            (jsonFiles, callback) =>
-            {
-                _.each(jsonFiles, (file) =>
-                {
-                    let name = path.basename(file, '.json').toLowerCase();
-                    file = path.join(configPath, file);
-
-                    result[name] = new objClass(file);
-                });
-
-                return callback(null);
-            },
-            (callback) => getUserConfigDirectory().then((userConfigDir) => callback(null, userConfigDir)),
-            (userConfigDir, callback) => 
-            {
-                userConfigPath = path.join(userConfigDir, name);
-
-                if (!fs.existsSync(userConfigPath))
-                    fs.mkdirSync(userConfigPath);
-
-                for (let name in result)
-                {
-                    let p = path.join(userConfigPath, name + '.json');
-
-                    if (!fs.existsSync(p))
-                        result[name].generateUserJsonFile(p);
-                }
-
-                listFiles(userConfigPath, ['json']).then((jsonFiles) => callback(null, jsonFiles));
-            },
-            (jsonFiles, callback) =>
-            {
-                _.each(jsonFiles, (file) =>
-                {
-                    let name = path.basename(file, '.json').toLowerCase();
-                    file = path.join(userConfigPath, file);
-
-                    if (result[name])
-                        result[name].updateFromUserJsonFile(file);
-                    else
-                        result[name] = new objClass(file);
-                });
-
-                return callback(null);
-            }
-        ],
-        (err) =>
-        {
-            resolve(result);
-        }
-        );
+        result[name] = new objClass(file);
     });
+
+    const userConfigDir = await getUserConfigDirectory()
+    userConfigPath = path.join(userConfigDir, name);
+
+    if (!fs.existsSync(userConfigPath))
+        fs.mkdirSync(userConfigPath);
+
+    for (const name in result)
+    {
+        let p = path.join(userConfigPath, `${name}.json`);
+
+        if (!fs.existsSync(p))
+            result[name].generateUserJsonFile(p);
+    }
+
+    const userJsonFiles = await listFiles(userConfigPath, ['json'])
+    for (let file of userJsonFiles)
+    {
+        let name = path.basename(file, '.json').toLowerCase();
+        file = path.join(userConfigPath, file);
+
+        if (result[name])
+            result[name].updateFromUserJsonFile(file);
+        else
+            result[name] = new objClass(file);
+    }
+
+    return result;
 };

@@ -31,7 +31,7 @@ export default class Game {
         this.name = path.basename(filePath, this.ext);
         this.cleanName = cleanRomName(this.name);
         this.exportToSteam = false;
-        this.grid = gameConfig.grid || "";
+        this.grid = gameConfig.grid || '';
         this.enabled = true;
 
         if (gameConfig.enabled !== undefined && gameConfig.enabled === false)

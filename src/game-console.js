@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import Game from './game';
-import _ from 'lodash';
+import keys from 'lodash/keys';
 import {getUserConfigDirectory} from './user-config';
 
 export default class GameConsole {
@@ -35,7 +35,7 @@ export default class GameConsole {
     updateFromUserJsonFile(jsonFilePath)
     {
         let jsonData = JSON.parse(fs.readFileSync(jsonFilePath));
-        
+
         this.name = jsonData.name || this.name;
         this.shortName = jsonData.shortName || this.shortName;
         this.tags = jsonData.tags || this.tags;
@@ -58,7 +58,7 @@ export default class GameConsole {
         var content = {
             name: this.name,
             romPaths: [],
-            emulator: "",
+            emulator: '',
             tags: this.tags,
             prefix: this.prefix,
             extensions: this.extensions
@@ -78,7 +78,7 @@ export default class GameConsole {
 
     getEmulator()
     {
-        let emulatorNames = _.keys(this.emulators);
+        let emulatorNames = keys(this.emulators);
 
         if (!emulatorNames.length)
             return null;
@@ -105,7 +105,7 @@ export default class GameConsole {
 
         let p = path.join(global.USER_CONFIG_DIR, 'consoles', fileName);
 
-        if (_.keys(this.romsConfig).length)
+        if (keys(this.romsConfig).length)
             fs.writeFileSync(p, JSON.stringify(this.romsConfig, null, 2));
     }
 
@@ -113,8 +113,8 @@ export default class GameConsole {
     {
         let config = this.romsConfig[name] || {
             enabled: true,
-            grid: ""
-        } 
+            grid: ''
+        }
 
         this.romsConfig[name] = config;
 
@@ -146,9 +146,9 @@ export default class GameConsole {
                 console.error('Directory does not exist: ' + dir);
                 continue;
             }
-            
+
             let entries = fs.readdirSync(dir);
-            
+
             for (let entry of entries)
             {
                 let p = path.join(dir, entry);
@@ -161,7 +161,7 @@ export default class GameConsole {
 
                 if (this.extensions.indexOf(ext) != -1)
                 {
-                    let gameConfig = this.getRomConfig(entry);                
+                    let gameConfig = this.getRomConfig(entry);
                     games.push(new Game(this, p, gameConfig));
                 }
             }
