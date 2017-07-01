@@ -1,4 +1,4 @@
-import ShortcutFile from './shortcut-file';
+import { ShortcutFile } from '../model';
 
 import fs from 'fs';
 import path from 'path';
@@ -44,7 +44,7 @@ export async function generateShortcuts({consoles, shortcutsFile})
         for(const game of gameConsole.games)
         {
             let gameShortcut = {
-                appname: gameConsole.prefix + ' ' + game.cleanName,
+                appname: `${gameConsole.prefix} ${game.cleanName}`,
                 exe: emulator.getCommandForGame(game),
                 icon: gameConsole.icon,
                 tags: gameConsole.tags,

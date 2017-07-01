@@ -1,7 +1,5 @@
 import * as fs from 'fs';
-import {Parser as VDFParser, Builder as VDFBuilder, Shortcut} from 'node-steam-shortcuts';
-import crc from 'crc';
-import {Uint64BE} from 'int64-buffer';
+import { Parser as VDFParser, Builder as VDFBuilder, Shortcut } from 'node-steam-shortcuts';
 import * as r from 'ramda';
 
 const defaultShortcutPath = 'steam-roms-importer';

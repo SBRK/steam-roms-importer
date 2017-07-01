@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import Game from './game';
+import { Game } from './index';
 import keys from 'lodash/keys';
-import {getUserConfigDirectory} from './user-config';
+import { getUserConfigDirectory } from '../user-config';
 
 export default class GameConsole {
     constructor(jsonFilePath)
@@ -143,7 +143,7 @@ export default class GameConsole {
             dir = path.normalize(dir);
             if (!fs.existsSync(dir))
             {
-                console.error('Directory does not exist: ' + dir);
+                console.error(`Directory does not exist: ${dir}`);
                 continue;
             }
 

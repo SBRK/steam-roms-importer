@@ -9,7 +9,7 @@ export default class Emulator {
         this.name = path.basename(jsonFilePath, path.extname(jsonFilePath));
 
         this.consoles = jsonData.consoles || [];
-        
+
         this.exe = jsonData.exe ? path.normalize(jsonData.exe) : '';
         this.command = jsonData.command || '{exe} {game}';
     }
@@ -19,7 +19,7 @@ export default class Emulator {
         let jsonData = JSON.parse(fs.readFileSync(jsonFilePath));
 
         this.consoles = jsonData.consoles || this.consoles;
-        
+
         this.exe = path.normalize(jsonData.exe || this.exe);
         this.command = jsonData.command || this.command;
     }
@@ -42,7 +42,7 @@ export default class Emulator {
     getCommandForGame(game)
     {
         return this.command
-            .replace('{exe}', '"' + this.exe + '"')
-            .replace('{game}', '"' + game.filePath + '"');
+            .replace('{exe}', `"${this.exe}"`)
+            .replace('{game}', `"${game.filePath}"`);
     }
 }

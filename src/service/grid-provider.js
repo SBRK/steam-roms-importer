@@ -60,9 +60,9 @@ let searchConsoleGridDB = async (game, console) =>
         'PS1': ['PLAYSTATION', 'SONYPLAYSTATION', 'PSX', 'PS', 'SONYPSX']
     }
 
-    let findShortCode = (console) =>
+    let findShortCode = (gameConsole) =>
     {
-        let c = console.replace(/\s/g, '').toUpperCase();
+        let c = gameConsole.replace(/\s/g, '').toUpperCase();
 
         for (let shortCode in shortCodes)
         {
@@ -70,12 +70,12 @@ let searchConsoleGridDB = async (game, console) =>
                 return shortCode;
         }
 
-        return console;
+        return gameConsole;
     }
 
     game = game.replace('-', ' ').replace(/CD {0-1}[0-9]/gi, '').replace(/ +/gi, ' ').replace(/ $/, '');
 
-    let url = `http://consolegrid.com/api/top_picture?console=${findShortCode(console)}&game=${encodeURIComponent(game)}`;
+    let url = `http://consolegrid.com/api/top_picture?console=${findShortCode(gameConsole)}&game=${encodeURIComponent(game)}`;
 
     let error, response
 
@@ -112,7 +112,7 @@ let gridProviders = [
     searchConsoleGridDB
 ];
 
-async function findGridImage (game, console='')
+async function findGridImage (game, gameConsole='')
 {
     let images = []
 
@@ -120,7 +120,7 @@ async function findGridImage (game, console='')
     {
         try
         {
-            const foundImages = await searchFunction(game, console);
+            const foundImages = await searchFunction(game, gameConsole);
             images = images.concat(foundImages);
         }
         catch (e)
@@ -143,7 +143,7 @@ export async function findGridImages ({games, steamConfigPath})
         if (!fs.existsSync(gridPath))
             fs.mkdirSync(gridPath);
 
-        let filePath = path.join(gridPath, appid + '.png');
+        let filePath = path.join(gridPath, `${appid}.png`);
 
         if (fs.existsSync(filePath))
         {
@@ -158,7 +158,7 @@ export async function findGridImages ({games, steamConfigPath})
             try
             {
                 const response = await request.get(images[0].image)
-                console.log('Found grid for ' + gameName);
+                console.log(`Found grid for ${gameName}`);
 
                 response.pipe(fs.createWriteStream(filePath))
             }

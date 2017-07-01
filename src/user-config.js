@@ -2,7 +2,7 @@ import Winreg from 'winreg';
 import path from 'path';
 import fs from 'fs';
 import each from 'lodash/each';
-import {resolveEnvPath} from './util';
+import { resolveEnvPath } from './util';
 
 export function getUserConfigDirectory()
 {

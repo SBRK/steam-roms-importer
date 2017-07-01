@@ -8,7 +8,7 @@ let cleanRomName = (name) =>
     name = name.replace(/ $/, '');
 
     if (name.indexOf(', The') != -1)
-        name = 'The ' + name.replace(', The', '');
+        name = `The ${name.replace(', The', '')}`;
 
     return name;
 }

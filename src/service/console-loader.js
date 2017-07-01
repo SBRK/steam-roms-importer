@@ -1,7 +1,6 @@
-import {loadConfigObject, getUserConfigDirectory} from './user-config';
+import {loadConfigObject, getUserConfigDirectory} from '../user-config';
 
-import GameConsole from './game-console';
-import Emulator from './emulator';
+import { GameConsole, Emulator } from '../model';
 
 export async function loadConsoles()
 {

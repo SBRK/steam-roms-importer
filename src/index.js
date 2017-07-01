@@ -1,8 +1,8 @@
 
-import {loadConfigObject, getUserConfigDirectory} from './user-config';
-import {loadConsoles} from './console-loader';
-import {getSteamConfigPath, loadShortcutsFile, generateShortcuts} from './shortcuts-loader';
-import {findGridImages} from './grid-provider';
+import { loadConfigObject, getUserConfigDirectory } from './user-config';
+import { loadConsoles } from './service/console-loader';
+import { getSteamConfigPath, loadShortcutsFile, generateShortcuts } from './service/shortcuts-loader';
+import { findGridImages } from './service/grid-provider';
 
 process.on('unhandledRejection', function(reason, p){
     console.log("Possibly Unhandled Rejection at: Promise ", p, " reason: ", reason);
