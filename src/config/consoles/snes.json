@@ -1,10 +1,10 @@
 {
-    "name": "Super NES",
-    "shortName": "SNES", 
-    "tags": ["SNES", "Nintendo"],
-    "prefix": "[SNES]", 
-    "icon": "snes.png",
-    "extensions": ["smc", "sfc", "zip"],
-    "romPaths": [],
-    "emulator": "snes9x"
+  "name": "Super NES",
+  "shortName": "SNES",
+  "tags": ["SNES", "Nintendo"],
+  "prefix": "[SNES]",
+  "icon": "snes.png",
+  "extensions": ["smc", "sfc", "zip"],
+  "romPaths": [],
+  "emulator": "snes9x"
 }

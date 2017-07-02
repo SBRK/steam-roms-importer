@@ -1,14 +1,16 @@
-export function resolveEnvPath(dir)
-{
-    let r = new RegExp(/%([a-zA-Z_]+)%/);
+const resolveEnvPath = (dir) => {
+  const r = new RegExp(/%([a-zA-Z_]+)%/);
 
-    let match = r.exec(dir);
+  let match = r.exec(dir);
 
-    while(match && match.length)
-    {
-        dir = dir.replace(match[0], process.env[match[1]]);
-        match = r.exec(dir);
-    }
+  let result = dir;
 
-    return dir;
-}
+  while (match && match.length) {
+    result = result.replace(match[0], process.env[match[1]]);
+    match = r.exec(result);
+  }
+
+  return result;
+};
+
+export { resolveEnvPath };

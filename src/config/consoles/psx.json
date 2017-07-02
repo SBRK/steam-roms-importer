@@ -1,10 +1,10 @@
 {
-    "name": "PlayStation",
-    "shortName": "PSX", 
-    "tags": ["PSX"],
-    "prefix": "[PSX]", 
-    "icon": "psx.png",
-    "extensions": ["iso", "bin", "img", "nrg"],
-    "romPaths": [],
-    "emulator": "pcsx"
+  "name": "PlayStation",
+  "shortName": "PSX",
+  "tags": ["PSX"],
+  "prefix": "[PSX]",
+  "icon": "psx.png",
+  "extensions": ["iso", "bin", "img", "nrg"],
+  "romPaths": [],
+  "emulator": "pcsx"
 }

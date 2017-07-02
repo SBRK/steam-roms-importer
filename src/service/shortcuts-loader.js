@@ -1,78 +1,62 @@
-import { ShortcutFile } from '../model';
-
 import fs from 'fs';
 import path from 'path';
+import each from 'lodash/each';
+import keys from 'lodash/keys';
 
-export function getSteamConfigPath()
-{
-    let users = fs.readdirSync('C:/Program Files (x86)/Steam/userdata/');
+import { ShortcutFile } from '../model';
 
-    if (!users || !users.length)
-        console.error('No steam directory found !');
+export const getSteamConfigPath = () => {
+  const users = fs.readdirSync('C:/Program Files (x86)/Steam/userdata/');
 
-    let filePath = `C:/Program Files (x86)/Steam/userdata/${users[0]}/config`;
+  if (!users || !users.length) throw (new Error('No steam directory found !'));
 
-    return filePath;
-}
+  const filePath = `C:/Program Files (x86)/Steam/userdata/${users[0]}/config`;
 
-export function loadShortcutsFile()
-{
-    return new Promise((resolve, reject) =>
-    {
-        let filePath = path.join(getSteamConfigPath(), 'shortcuts.vdf');
+  return filePath;
+};
 
-        let shortcutFile = new ShortcutFile(filePath);
+export const loadShortcutsFile = () => new Promise((resolve) => {
+  const filePath = path.join(getSteamConfigPath(), 'shortcuts.vdf');
 
-        return resolve(shortcutFile);
-    });
-}
+  const shortcutFile = new ShortcutFile(filePath);
 
-export async function generateShortcuts({consoles, shortcutsFile})
-{
-    let games = [];
+  return resolve(shortcutFile);
+});
 
-    for (const consoleName in consoles)
-    {
-        const gameConsole = consoles[consoleName]
+export async function generateShortcuts(consoles, shortcutsFile) {
+  const games = [];
 
-        gameConsole.searchGames();
-        let emulator = gameConsole.getEmulator();
+  each(keys(consoles), (consoleName) => {
+    const gameConsole = consoles[consoleName];
 
-        if (!emulator)
-            continue;
+    gameConsole.searchGames();
+    const emulator = gameConsole.getEmulator();
 
-        for(const game of gameConsole.games)
-        {
-            let gameShortcut = {
-                appname: `${gameConsole.prefix} ${game.cleanName}`,
-                exe: emulator.getCommandForGame(game),
-                icon: gameConsole.icon,
-                tags: gameConsole.tags,
-            }
+    if (emulator) {
+      each(gameConsole.games, (game) => {
+        const gameShortcut = {
+          appname: `${gameConsole.prefix} ${game.cleanName}`,
+          exe: emulator.getCommandForGame(game),
+          icon: gameConsole.icon,
+          tags: gameConsole.tags,
+        };
 
-            gameShortcut.appname = gameShortcut.appname.replace(/^ +/, '').replace(/ +$/, '');
+        gameShortcut.appname = gameShortcut.appname.replace(/^ +/, '').replace(/ +$/, '');
 
-            if (!game.ignore)
-            {
-                let shortcut = shortcutsFile.addShortcut(gameShortcut);
+        if (!game.ignore) {
+          const shortcut = shortcutsFile.addShortcut(gameShortcut);
 
-                games.push({
-                    gameName: game.cleanName,
-                    consoleName: gameConsole.name,
-                    appid: shortcut.getAppID()
-                });
-            }
+          games.push({
+            gameName: game.cleanName,
+            consoleName: gameConsole.name,
+            appid: shortcut.getAppID(),
+          });
         }
+      });
     }
+  });
 
-    try
-    {
-        await shortcutsFile.writeShortcuts();
-    }
-    catch (error)
-    {
-        throw(error)
-    }
+  await shortcutsFile.writeShortcuts();
 
-    return games;
+  return games;
 }

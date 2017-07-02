@@ -1,174 +1,156 @@
 import fs from 'fs';
 import path from 'path';
-import { Game } from './index';
 import keys from 'lodash/keys';
-import { getUserConfigDirectory } from '../user-config';
+
+import { Game } from './index';
 
 export default class GameConsole {
-    constructor(jsonFilePath)
-    {
-        let jsonData = JSON.parse(fs.readFileSync(jsonFilePath));
+  constructor(jsonFilePath) {
+    const jsonData = JSON.parse(fs.readFileSync(jsonFilePath));
 
-        this.filePath = jsonFilePath;
+    this.filePath = jsonFilePath;
 
-        this.name = jsonData.name || '';
-        this.shortName = jsonData.shortName || '';
-        this.tags = jsonData.tags || [];
-        this.prefix = jsonData.prefix || '';
-        this.icon = jsonData.icon || '';
-        this.romPaths = jsonData.romPaths || [];
-        this.extensions = jsonData.extensions || [];
-        this.emulators = {};
-        this.emulator = jsonData.emulator || 0;
-        this.romsConfig = {};
+    this.name = jsonData.name || '';
+    this.shortName = jsonData.shortName || '';
+    this.tags = jsonData.tags || [];
+    this.prefix = jsonData.prefix || '';
+    this.icon = jsonData.icon || '';
+    this.romPaths = jsonData.romPaths || [];
+    this.extensions = jsonData.extensions || [];
+    this.emulators = {};
+    this.emulator = jsonData.emulator || 0;
+    this.romsConfig = {};
 
-        if (this.icon && this.icon.length)
-        {
-            let configPath = path.join(__dirname, 'config', 'icons');
+    if (this.icon && this.icon.length) {
+      const iconsPath = path.join(this.getConfigPath(), 'icons');
 
-            this.icon = path.resolve(configPath, path.normalize(this.icon));
-        }
-
-        this.loadRomsConfig();
+      this.icon = path.resolve(iconsPath, path.normalize(this.icon));
     }
 
-    updateFromUserJsonFile(jsonFilePath)
-    {
-        let jsonData = JSON.parse(fs.readFileSync(jsonFilePath));
+    this.loadRomsConfig();
+  }
 
-        this.name = jsonData.name || this.name;
-        this.shortName = jsonData.shortName || this.shortName;
-        this.tags = jsonData.tags || this.tags;
-        this.prefix = jsonData.prefix || this.prefix;
-        this.icon = jsonData.icon || this.icon;
-        this.romPaths = jsonData.romPaths || this.romPaths;
-        this.extensions = jsonData.extensions || this.extensions;
-        this.emulator = jsonData.emulator || this.emulator;
+  getConfigPath() {
+    return path.resolve(path.join(__dirname, '../', 'config'));
+  }
 
-        if (this.icon && this.icon.length)
-        {
-            let configPath = path.join(__dirname, 'config', 'icons');
+  updateFromUserJsonFile(jsonFilePath) {
+    const jsonData = JSON.parse(fs.readFileSync(jsonFilePath));
 
-            this.icon = path.resolve(configPath, path.normalize(this.icon));
-        }
+    this.name = jsonData.name || this.name;
+    this.shortName = jsonData.shortName || this.shortName;
+    this.tags = jsonData.tags || this.tags;
+    this.prefix = jsonData.prefix || this.prefix;
+    this.icon = jsonData.icon || this.icon;
+    this.romPaths = jsonData.romPaths || this.romPaths;
+    this.extensions = jsonData.extensions || this.extensions;
+    this.emulator = jsonData.emulator || this.emulator;
+
+    if (this.icon && this.icon === jsonData.icon) {
+      const iconsPath = path.join(this.getConfigPath(), 'icons');
+
+      this.icon = path.resolve(iconsPath, path.normalize(this.icon));
     }
+  }
 
-    generateUserJsonFile(jsonFilePath)
-    {
-        var content = {
-            name: this.name,
-            romPaths: [],
-            emulator: '',
-            tags: this.tags,
-            prefix: this.prefix,
-            extensions: this.extensions
-        }
+  generateUserJsonFile(jsonFilePath) {
+    const content = {
+      name: this.name,
+      romPaths: [],
+      emulator: '',
+      tags: this.tags,
+      prefix: this.prefix,
+      extensions: this.extensions,
+    };
 
-        var contentJsonString = JSON.stringify(content, null, 4);
+    const contentJsonString = JSON.stringify(content, null, 4);
 
-        fs.writeFileSync(jsonFilePath, contentJsonString);
+    fs.writeFileSync(jsonFilePath, contentJsonString);
 
-        console.log(`Generated user config file for console ${this.name} at ${jsonFilePath}`);
-    }
+    console.log(`Generated user config file for console ${this.name} at ${jsonFilePath}`);
+  }
 
-    addEmulator(emulatorName, emulator)
-    {
-        this.emulators[emulatorName] = emulator;
-    }
+  addEmulator(emulatorName, emulator) {
+    this.emulators[emulatorName] = emulator;
+  }
 
-    getEmulator()
-    {
-        let emulatorNames = keys(this.emulators);
+  getEmulator() {
+    const emulatorNames = keys(this.emulators);
 
-        if (!emulatorNames.length)
-            return null;
+    if (!emulatorNames.length) return null;
+    if (!this.emulator) return this.emulators[emulatorNames[0]];
 
-        if (!this.emulator)
-            return this.emulators[emulatorNames[0]];
+    return this.emulators[this.emulator];
+  }
 
-        return this.emulators[this.emulator];
-    }
+  loadRomsConfig() {
+    const fileName = path.basename(this.filePath).replace('.json', '.roms');
 
-    loadRomsConfig()
-    {
-        let fileName = path.basename(this.filePath).replace('.json', '.roms');
+    const p = path.join(global.USER_CONFIG_DIR, 'consoles', fileName);
 
-        let p = path.join(global.USER_CONFIG_DIR, 'consoles', fileName);
+    if (fs.existsSync(p)) this.romsConfig = JSON.parse(fs.readFileSync(p));
+  }
 
-        if (fs.existsSync(p))
-            this.romsConfig = JSON.parse(fs.readFileSync(p));
-    }
+  saveRomsConfig() {
+    const fileName = path.basename(this.filePath).replace('.json', '.roms');
 
-    saveRomsConfig()
-    {
-        let fileName = path.basename(this.filePath).replace('.json', '.roms');
+    const p = path.join(global.USER_CONFIG_DIR, 'consoles', fileName);
 
-        let p = path.join(global.USER_CONFIG_DIR, 'consoles', fileName);
+    if (keys(this.romsConfig).length) fs.writeFileSync(p, JSON.stringify(this.romsConfig, null, 2));
+  }
 
-        if (keys(this.romsConfig).length)
-            fs.writeFileSync(p, JSON.stringify(this.romsConfig, null, 2));
-    }
+  getRomConfig(name) {
+    const config = this.romsConfig[name] || {
+      enabled: true,
+      grid: '',
+    };
 
-    getRomConfig(name)
-    {
-        let config = this.romsConfig[name] || {
-            enabled: true,
-            grid: ''
-        }
+    this.romsConfig[name] = config;
 
-        this.romsConfig[name] = config;
+    return config;
+  }
 
-        return config;
-    }
+  toObject() {
+    return {
+      name: this.name,
+      shortName: this.shortName,
+      tags: this.tags,
+      prefix: this.prefix,
+      icon: this.icon,
+      romPaths: this.romPaths,
+      extensions: this.extensions,
+    };
+  }
 
-    toObject()
-    {
-        return {
-            name: this.name,
-            shortName: this.shortName,
-            tags: this.tags,
-            prefix: this.prefix,
-            icon: this.icon,
-            romPaths: this.romPaths,
-            extensions: this.extensions
-        };
-    }
+  searchGames() {
+    const games = [];
 
-    searchGames()
-    {
-        let games = [];
+    for (let dir of this.romPaths) {
+      dir = path.normalize(dir);
 
-        for (let dir of this.romPaths)
-        {
-            dir = path.normalize(dir);
-            if (!fs.existsSync(dir))
-            {
-                console.error(`Directory does not exist: ${dir}`);
-                continue;
+      if (!fs.existsSync(dir)) {
+        console.error(`Directory does not exist: ${dir}`);
+      } else {
+        const entries = fs.readdirSync(dir);
+
+        for (const entry of entries) {
+          const p = path.join(dir, entry);
+          const s = fs.statSync(p);
+
+          if (s.isFile()) {
+            const ext = path.extname(entry).replace(/^\./, '');
+
+            if (this.extensions.indexOf(ext) !== -1) {
+              const gameConfig = this.getRomConfig(entry);
+              games.push(new Game(this, p, gameConfig));
             }
-
-            let entries = fs.readdirSync(dir);
-
-            for (let entry of entries)
-            {
-                let p = path.join(dir, entry);
-                let s = fs.statSync(p);
-
-                if (!s.isFile())
-                    continue;
-
-                let ext = path.extname(entry).replace(/^\./, '');
-
-                if (this.extensions.indexOf(ext) != -1)
-                {
-                    let gameConfig = this.getRomConfig(entry);
-                    games.push(new Game(this, p, gameConfig));
-                }
-            }
+          }
         }
-
-        this.games = games;
-
-        this.saveRomsConfig();
+      }
     }
+
+    this.games = games;
+
+    this.saveRomsConfig();
+  }
 }

@@ -1,5 +1,5 @@
 {
-    "consoles": ["n64"],
-    "command": "{exe} {game}",
-    "exe": ""
+  "consoles": ["n64"],
+  "command": "{exe} {game}",
+  "exe": ""
 }

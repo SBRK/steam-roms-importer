@@ -1,10 +1,10 @@
 {
-    "name": "GameBoy Advance",
-    "shortName": "GBA", 
-    "tags": ["GBA"],
-    "prefix": "[GBA]", 
-    "icon": "gba.png",
-    "extensions": ["gba"],
-    "romPaths": [],
-    "emulator": "vba"
+  "name": "GameBoy Advance",
+  "shortName": "GBA",
+  "tags": ["GBA"],
+  "prefix": "[GBA]",
+  "icon": "gba.png",
+  "extensions": ["gba"],
+  "romPaths": [],
+  "emulator": "vba"
 }
