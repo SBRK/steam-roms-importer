@@ -1,9 +1,7 @@
 import Winreg from 'winreg';
 import path from 'path';
 import fs from 'fs';
-import each from 'lodash/each';
-import keys from 'lodash/keys';
-import { resolveEnvPath } from './util';
+import { resolveEnvPath, each, keys } from './util';
 
 export const getUserConfigDirectory = () => new Promise((resolve) => {
   const regKey = new Winreg({

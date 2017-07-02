@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import keys from 'lodash/keys';
 
 import { Game } from './index';
+import { each, keys } from '../util';
 
 export default class GameConsole {
   constructor(jsonFilePath) {
@@ -125,29 +125,29 @@ export default class GameConsole {
   searchGames() {
     const games = [];
 
-    for (let dir of this.romPaths) {
-      dir = path.normalize(dir);
+    each(this.romPaths, (romPath) => {
+      const romDir = path.normalize(romPath);
 
-      if (!fs.existsSync(dir)) {
-        console.error(`Directory does not exist: ${dir}`);
+      if (!fs.existsSync(romDir)) {
+        console.error(`Directory does not exist: ${romDir}`);
       } else {
-        const entries = fs.readdirSync(dir);
+        const entries = fs.readdirSync(romDir);
 
-        for (const entry of entries) {
-          const p = path.join(dir, entry);
+        each(entries, (entry) => {
+          const p = path.join(romDir, entry);
           const s = fs.statSync(p);
 
           if (s.isFile()) {
             const ext = path.extname(entry).replace(/^\./, '');
 
-            if (this.extensions.indexOf(ext) !== -1) {
+            if (this.extensions.includes(ext)) {
               const gameConfig = this.getRomConfig(entry);
               games.push(new Game(this, p, gameConfig));
             }
           }
-        }
+        });
       }
-    }
+    });
 
     this.games = games;
 

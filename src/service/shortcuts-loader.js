@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import each from 'lodash/each';
-import keys from 'lodash/keys';
+import { each, keys } from '../util';
 
 import { ShortcutFile } from '../model';
 

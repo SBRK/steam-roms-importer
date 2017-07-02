@@ -2,6 +2,7 @@ import superagent from 'superagent';
 import path from 'path';
 import fs from 'fs';
 import request from 'request';
+import { each, keys } from '../util';
 
 const cleanName = (name) => {
   const gameName = name
@@ -36,14 +37,14 @@ const searchSteamGridDB = async (gameName) => {
   const images = [];
   const data = JSON.parse(response.text);
 
-  for (const d of data) {
+  each(data, (d) => {
     if ((typeof d === 'object') && d.grid_link) {
       images.push({
         image: d.grid_link,
         thumbnail: d.thumbnail_link,
       });
     }
-  }
+  });
 
   return images;
 };
@@ -68,14 +69,17 @@ const searchConsoleGridDB = async (gameName, consoleName) => {
       .replace(/\s/g, '')
       .toUpperCase();
 
-    for (const shortCode in shortCodes) {
-      if (shortCodes[shortCode].indexOf(c) !== -1) return shortCode;
-    }
+    let result = name;
 
-    return name;
+    each(keys(shortCodes), (shortCode) => {
+      if (shortCodes[shortCode].indexOf(c) !== -1) result = shortCode;
+    });
+
+    return result;
   };
 
-  const url = `http://consolegrid.com/api/top_picture?console=${findShortCode(consoleName)}&game=${encodeURIComponent(game)}`;
+  const consoleShortCode = await findShortCode(consoleName);
+  const url = `http://consolegrid.com/api/top_picture?console=${consoleShortCode}&game=${encodeURIComponent(game)}`;
 
   let error;
   let response;
@@ -93,12 +97,12 @@ const searchConsoleGridDB = async (gameName, consoleName) => {
   const images = [];
   const data = response.text.split('\n');
 
-  for (const d of data) {
+  each(data, (d) => {
     images.push({
       image: d,
       thumbnail: d,
     });
-  }
+  });
 
   return images;
 };
@@ -111,48 +115,46 @@ const gridProviders = [
 const findGridImage = async (gameName, consoleName = '') => {
   let images = [];
 
-  for (const searchFunction of gridProviders) {
+  await each(gridProviders, async (searchFunction) => {
     try {
       const foundImages = await searchFunction(gameName, consoleName);
       images = images.concat(foundImages);
     } catch (e) {
     }
-  }
+  });
 
   return images;
 };
 
-const findGridImages = async (games, steamConfigPath) => {
-  for (const game of games) {
-    const { gameName, consoleName, appid } = game;
+const findGridImages = async (games, steamConfigPath) => each(games, async (game) => {
+  const { gameName, consoleName, appid } = game;
 
-    const gridPath = path.join(steamConfigPath, 'grid');
-    const filePath = path.join(gridPath, `${appid}.png`);
+  const gridPath = path.join(steamConfigPath, 'grid');
+  const filePath = path.join(gridPath, `${appid}.png`);
 
-    if (!fs.existsSync(gridPath)) fs.mkdirSync(gridPath);
+  if (!fs.existsSync(gridPath)) fs.mkdirSync(gridPath);
 
-    if (!fs.existsSync(filePath)) {
-      const images = await findGridImage(gameName, consoleName);
-      let foundImages = false;
+  if (!fs.existsSync(filePath)) {
+    const images = await findGridImage(gameName, consoleName);
+    let foundImages = false;
 
-      if (images && images.length) {
-        try {
-          const response = await request.get(images[0].image);
-          response.pipe(fs.createWriteStream(filePath));
+    if (images && images.length) {
+      try {
+        const response = await request.get(images[0].image);
+        response.pipe(fs.createWriteStream(filePath));
 
-          foundImages = true;
-        } catch (err) {
-          foundImages = false;
-        }
+        foundImages = true;
+      } catch (err) {
+        foundImages = false;
       }
-
-      if (foundImages) console.log(`Found grid for ${gameName}`);
-      else console.warn(`No grid image found for ${gameName}`);
-    } else {
-      console.warn(`Grid image for ${gameName} already exists, skipping.`);
     }
+
+    if (foundImages) console.log(`Found grid for ${gameName}`);
+    else console.warn(`No grid image found for ${gameName}`);
+  } else {
+    console.warn(`Grid image for ${gameName} already exists, skipping.`);
   }
-};
+});
 
 export { findGridImages };
 export default findGridImages;
