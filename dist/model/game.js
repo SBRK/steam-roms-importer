@@ -61,4 +61,3 @@ var Game = function () {
 }();
 
 exports.default = Game;
-//# sourceMappingURL=game.js.map

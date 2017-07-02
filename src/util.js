@@ -28,6 +28,7 @@ const map = (a, fn) => {
   return results;
 };
 
+const timeout = ms => new Bluebird(resolve => setTimeout(resolve, ms));
 
 const resolveEnvPath = (dir) => {
   const r = new RegExp(/%([a-zA-Z_]+)%/);
@@ -51,4 +52,5 @@ export {
   each,
   map,
   keys,
+  timeout,
 };

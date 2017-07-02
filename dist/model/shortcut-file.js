@@ -88,4 +88,3 @@ var ShortcutFile = function () {
 }();
 
 exports.default = ShortcutFile;
-//# sourceMappingURL=shortcut-file.js.map

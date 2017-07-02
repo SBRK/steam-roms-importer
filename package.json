@@ -1,16 +1,26 @@
 {
   "name": "steam-roms-importer",
-  "version": "0.0.1",
-  "description": "",
-  "scripts": {
-    "dev": "nodemon --exec babel-node src/main.js",
-    "build": "rimraf dist && babel src --out-dir dist --source-maps --copy-files",
-    "start": "node dist/main.js",
-    "lint": "eslint ./src --fix"
-  },
   "author": "Benjamin Michel",
+  "description": "Easily make your roms available as shortcuts in Steam.",
+  "version": "1.0.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SBRK/steam-roms-importer.git"
+  },
+  "scripts": {
+    "dev": "nodemon --exec babel-node ./src/main.js",
+    "build": "rimraf dist && babel src --out-dir dist --copy-files",
+    "prepublish": "npm run build",
+    "start": "node ./dist/main.js",
+    "lint": "eslint ./src",
+    "lint-fix": "eslint ./src --fix"
+  },
+  "bin": {
+    "steam-roms-importer": "./bin/cli.js"
+  },
   "dependencies": {
     "bluebird": "^3.5.0",
+    "colors": "^1.1.2",
     "lodash": "^4.17.2",
     "node-steam-shortcuts": "^1.1.0",
     "path": "^0.12.7",
@@ -28,5 +38,6 @@
     "eslint-plugin-react": "^7.0.1",
     "nodemon": "^1.11.0",
     "rimraf": "^2.6.1"
-  }
+  },
+  "license": "GPLv3"
 }

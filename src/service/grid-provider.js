@@ -2,6 +2,8 @@ import superagent from 'superagent';
 import path from 'path';
 import fs from 'fs';
 import request from 'request';
+import 'colors';
+
 import { each, keys } from '../util';
 
 const cleanName = (name) => {
@@ -126,35 +128,43 @@ const findGridImage = async (gameName, consoleName = '') => {
   return images;
 };
 
-const findGridImages = async (games, steamConfigPath) => each(games, async (game) => {
-  const { gameName, consoleName, appid } = game;
+const findGridImages = async (games, steamConfigPath) => {
+  console.log('');
+  console.log(`Searching for grid images for ${games.length.toString().green} games`)
+  console.log('');
 
-  const gridPath = path.join(steamConfigPath, 'grid');
-  const filePath = path.join(gridPath, `${appid}.png`);
+  await each(games, async (game) => {
+    const { gameName, consoleName, appid } = game;
 
-  if (!fs.existsSync(gridPath)) fs.mkdirSync(gridPath);
+    const gridPath = path.join(steamConfigPath, 'grid');
+    const filePath = path.join(gridPath, `${appid}.png`);
 
-  if (!fs.existsSync(filePath)) {
-    const images = await findGridImage(gameName, consoleName);
-    let foundImages = false;
+    if (!fs.existsSync(gridPath)) fs.mkdirSync(gridPath);
 
-    if (images && images.length) {
-      try {
-        const response = await request.get(images[0].image);
-        response.pipe(fs.createWriteStream(filePath));
+    if (!fs.existsSync(filePath)) {
+      const images = await findGridImage(gameName, consoleName);
+      let foundImages = false;
 
-        foundImages = true;
-      } catch (err) {
-        foundImages = false;
+      if (images && images.length) {
+        try {
+          const response = await request.get(images[0].image);
+          response.pipe(fs.createWriteStream(filePath));
+
+          foundImages = true;
+        } catch (err) {
+          foundImages = false;
+        }
       }
+
+      if (foundImages) console.log(`  ${'+'.green} Found grid for ${gameName.bgBlack.white} (${consoleName})`);
+      else console.warn(`  ${'!!'.red} No grid image found for ${gameName.bgBlack.white} (${consoleName})`);
+    } else {
+      console.warn(`  ${'-'.grey} Grid image for ${gameName.bgBlack.white} (${consoleName}) already exists, skipping.`);
     }
+  });
 
-    if (foundImages) console.log(`Found grid for ${gameName}`);
-    else console.warn(`No grid image found for ${gameName}`);
-  } else {
-    console.warn(`Grid image for ${gameName} already exists, skipping.`);
-  }
-});
+  console.log('');
+}
 
-export { findGridImages };
+export { findGridImages, findGridImage };
 export default findGridImages;

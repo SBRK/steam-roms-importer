@@ -14,6 +14,10 @@ var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
+require('colors');
+
+var _util = require('../util');
+
 var _model = require('../model');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -41,21 +45,19 @@ var loadShortcutsFile = exports.loadShortcutsFile = function loadShortcutsFile()
 async function generateShortcuts(consoles, shortcutsFile) {
   var games = [];
 
-  for (var consoleName in consoles) {
+  (0, _util.each)((0, _util.keys)(consoles), function (consoleName) {
     var gameConsole = consoles[consoleName];
 
     gameConsole.searchGames();
     var emulator = gameConsole.getEmulator();
 
+    console.log('');
+    console.log(('Generating shortcuts for ' + gameConsole.name.red + '...').bgGreen.white);
+
     if (emulator) {
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = gameConsole.games[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var game = _step.value;
-
+      if (gameConsole.games && gameConsole.games.length) {
+        console.log('  Adding ' + gameConsole.games.length.toString().green + ' games for ' + gameConsole.name.grey + '.');
+        (0, _util.each)(gameConsole.games, function (game) {
           var gameShortcut = {
             appname: gameConsole.prefix + ' ' + game.cleanName,
             exe: emulator.getCommandForGame(game),
@@ -67,33 +69,32 @@ async function generateShortcuts(consoles, shortcutsFile) {
 
           if (!game.ignore) {
             var shortcut = shortcutsFile.addShortcut(gameShortcut);
+            var appid = shortcut.getAppID();
+
+            console.log('    ' + '+'.green + ' Added game ' + game.cleanName.bgBlack.white + ' with APP ID ' + appid.grey);
 
             games.push({
               gameName: game.cleanName,
               consoleName: gameConsole.name,
-              appid: shortcut.getAppID()
+              appid: appid
             });
+          } else {
+            console.log(('    - Ignoring game "' + game.cleanName + '" (' + gameConsole.name + ')').grey);
           }
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
+        });
+      } else {
+        console.warn('  ' + '!!'.red + ' No games found for ' + gameConsole.name + ', not adding any games.');
       }
+    } else {
+      console.warn('  ' + '!!'.red + ' No emulator found for ' + gameConsole.name + ', not adding any games.');
     }
-  }
+
+    console.log('');
+  });
 
   await shortcutsFile.writeShortcuts();
+  console.log(('** Shortcuts file saved, ' + games.length.toString().green + ' games added ! **').bgBlue);
+  console.log('');
 
   return games;
 }
-//# sourceMappingURL=shortcuts-loader.js.map

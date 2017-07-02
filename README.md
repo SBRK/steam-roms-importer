@@ -1,21 +1,19 @@
 # steam-roms-importer
 Add your roms as Steam shortcuts
 
-Usage: 
-
-`npm install`
-
-`npm run build`
-
-`npm start`
+## Usage:
+```bash
+npm install -g steam-roms-importer
+steam-roms-importer
+```
 
 Upon running the script for the first time, config files will be generated in `My Documents\steam-roms\*`.
 
-In the `consoles` folder, you will find configuration files for consoles. In each json file, you will have to specify the `romPaths` parameter for the script to find your roms, for example: 
+In the `consoles` folder, you will find configuration files for consoles. In each json file, you will have to specify the `romPaths` parameter for the script to find your roms, for example:
 
 ```
 {
-	"romPaths": ["D:/Roms/SNES", "C:/Roms/SNES"]
+  "romPaths": ["D:/Roms/SNES", "C:/Roms/SNES"]
 }
 ```
 
@@ -23,10 +21,26 @@ In the `emulators` folder, you will find configuration files for emulators. In e
 
 ```
 {
-    "exe": "D:/Emulators/Dolphin/Dolphin.exe",
-    "command": "{exe} /e {game} /b"
+  "exe": "D:/Emulators/Dolphin/Dolphin.exe",
+  "command": "{exe} /e {game} /b"
 }
 ```
 
-Once you changed all of your console and emulator config files, run the script again with `npm start` and you should see the games being added to the Steam shortcut file. Restart Steam to see them in your library.
+Once you changed all of your console and emulator config files, run the script again with `steam-roms-importer` and you should see the games being added to the Steam shortcut file. Restart Steam to see them in your library.
 
+## Running in dev
+
+First of all, install the dependencies:
+```bash
+npm install
+```
+
+Run the script in dev mode, with auto-restart:
+```bash
+npm run dev
+```
+
+Check linting:
+```bash
+npm run lint
+```
