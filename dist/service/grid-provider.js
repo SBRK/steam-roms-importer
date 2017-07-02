@@ -23,6 +23,8 @@ var _request = require('request');
 
 var _request2 = _interopRequireDefault(_request);
 
+require('colors');
+
 var _util = require('../util');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -139,7 +141,11 @@ var findGridImage = async function findGridImage(gameName) {
 };
 
 var findGridImages = async function findGridImages(games, steamConfigPath) {
-  return (0, _util.each)(games, async function (game) {
+  console.log('');
+  console.log('Searching for grid images for ' + games.length.toString().green + ' games');
+  console.log('');
+
+  await (0, _util.each)(games, async function (game) {
     var gameName = game.gameName,
         consoleName = game.consoleName,
         appid = game.appid;
@@ -165,11 +171,13 @@ var findGridImages = async function findGridImages(games, steamConfigPath) {
         }
       }
 
-      if (foundImages) console.log('Found grid for ' + gameName);else console.warn('No grid image found for ' + gameName);
+      if (foundImages) console.log('  ' + '+'.green + ' Found grid for ' + gameName.bgBlack.white + ' (' + consoleName + ')');else console.warn('  ' + '!!'.red + ' No grid image found for ' + gameName.bgBlack.white + ' (' + consoleName + ')');
     } else {
-      console.warn('Grid image for ' + gameName + ' already exists, skipping.');
+      console.warn('  ' + '-'.grey + ' Grid image for ' + gameName.bgBlack.white + ' (' + consoleName + ') already exists, skipping.');
     }
   });
+
+  console.log('');
 };
 
 exports.findGridImages = findGridImages;

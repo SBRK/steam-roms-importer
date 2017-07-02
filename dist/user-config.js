@@ -83,7 +83,10 @@ var loadConfigObject = exports.loadConfigObject = async function loadConfigObjec
   (0, _util.each)((0, _util.keys)(result), function (fileName) {
     var p = _path2.default.join(userConfigPath, fileName + '.json');
 
-    if (!_fs2.default.existsSync(p)) result[fileName].generateUserJsonFile(p);
+    if (!_fs2.default.existsSync(p)) {
+      global.openUserConfigDir = true;
+      result[fileName].generateUserJsonFile(p);
+    }
   });
 
   var userJsonFiles = await listFiles(userConfigPath, ['json']);

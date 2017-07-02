@@ -1,8 +1,11 @@
 import fs from 'fs';
 import path from 'path';
+import 'colors';
+
 import { each, keys } from '../util';
 
 import { ShortcutFile } from '../model';
+
 
 export const getSteamConfigPath = () => {
   const users = fs.readdirSync('C:/Program Files (x86)/Steam/userdata/');
@@ -31,35 +34,50 @@ export async function generateShortcuts(consoles, shortcutsFile) {
     gameConsole.searchGames();
     const emulator = gameConsole.getEmulator();
 
+    console.log('');
+    console.log(`Generating shortcuts for ${gameConsole.name.red}...`.bgGreen.white);
+
     if (emulator) {
-      each(gameConsole.games, (game) => {
-        const gameShortcut = {
-          appname: `${gameConsole.prefix} ${game.cleanName}`,
-          exe: emulator.getCommandForGame(game),
-          icon: gameConsole.icon,
-          tags: gameConsole.tags,
-        };
+      if (gameConsole.games && gameConsole.games.length) {
+        console.log(`  Adding ${gameConsole.games.length.toString().green} games for ${gameConsole.name.grey}.`);
+        each(gameConsole.games, (game) => {
+          const gameShortcut = {
+            appname: `${gameConsole.prefix} ${game.cleanName}`,
+            exe: emulator.getCommandForGame(game),
+            icon: gameConsole.icon,
+            tags: gameConsole.tags,
+          };
 
-        gameShortcut.appname = gameShortcut.appname.replace(/^ +/, '').replace(/ +$/, '');
+          gameShortcut.appname = gameShortcut.appname.replace(/^ +/, '').replace(/ +$/, '');
 
-        if (!game.ignore) {
-          const shortcut = shortcutsFile.addShortcut(gameShortcut);
-          const appid = shortcut.getAppID();
+          if (!game.ignore) {
+            const shortcut = shortcutsFile.addShortcut(gameShortcut);
+            const appid = shortcut.getAppID();
 
-          console.log(`Added game "${game.cleanName}" (${gameConsole.name}) to Steam shortcuts with APP ID ${appid}`);
+            console.log(`    ${'+'.green} Added game ${game.cleanName.bgBlack.white} with APP ID ${appid.grey}`);
 
-          games.push({
-            gameName: game.cleanName,
-            consoleName: gameConsole.name,
-            appid,
-          });
-        }
-      });
+            games.push({
+              gameName: game.cleanName,
+              consoleName: gameConsole.name,
+              appid,
+            });
+          } else {
+            console.log(`    - Ignoring game "${game.cleanName}" (${gameConsole.name})`.grey);
+          }
+        });
+      } else {
+        console.warn(`  ${'!!'.red} No games found for ${gameConsole.name}, not adding any games.`);
+      }
+    } else {
+      console.warn(`  ${'!!'.red} No emulator found for ${gameConsole.name}, not adding any games.`);
     }
+
+    console.log('');
   });
 
   await shortcutsFile.writeShortcuts();
-  console.log('Shortcuts file saved');
+  console.log(`** Shortcuts file saved, ${games.length.toString().green} games added ! **`.bgBlue);
+  console.log('')
 
   return games;
 }

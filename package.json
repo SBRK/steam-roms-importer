@@ -2,7 +2,7 @@
   "name": "steam-roms-importer",
   "author": "Benjamin Michel",
   "description": "Easily make your roms available as shortcuts in Steam.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/SBRK/steam-roms-importer.git"
@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "bluebird": "^3.5.0",
+    "colors": "^1.1.2",
     "lodash": "^4.17.2",
     "node-steam-shortcuts": "^1.1.0",
     "path": "^0.12.7",

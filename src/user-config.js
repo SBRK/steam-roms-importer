@@ -57,7 +57,10 @@ export const loadConfigObject = async (name, ObjClass) => {
   each(keys(result), (fileName) => {
     const p = path.join(userConfigPath, `${fileName}.json`);
 
-    if (!fs.existsSync(p)) result[fileName].generateUserJsonFile(p);
+    if (!fs.existsSync(p)) {
+      global.openUserConfigDir = true;
+      result[fileName].generateUserJsonFile(p);
+    }
   });
 
   const userJsonFiles = await listFiles(userConfigPath, ['json']);

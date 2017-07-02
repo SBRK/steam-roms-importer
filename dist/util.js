@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.keys = exports.map = exports.each = exports.resolveEnvPath = undefined;
+exports.timeout = exports.keys = exports.map = exports.each = exports.resolveEnvPath = undefined;
 
 var _bluebird = require('bluebird');
 
@@ -48,6 +48,12 @@ var map = function map(a, fn) {
   return results;
 };
 
+var timeout = function timeout(ms) {
+  return new _bluebird2.default(function (resolve) {
+    return setTimeout(resolve, ms);
+  });
+};
+
 var resolveEnvPath = function resolveEnvPath(dir) {
   var r = new RegExp(/%([a-zA-Z_]+)%/);
 
@@ -69,3 +75,4 @@ exports.resolveEnvPath = resolveEnvPath;
 exports.each = each;
 exports.map = map;
 exports.keys = keys;
+exports.timeout = timeout;
