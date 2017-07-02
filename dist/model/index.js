@@ -27,4 +27,3 @@ exports.GameConsole = _gameConsole2.default;
 exports.Emulator = _emulator2.default;
 exports.Game = _game2.default;
 exports.ShortcutFile = _shortcutFile2.default;
-//# sourceMappingURL=index.js.map

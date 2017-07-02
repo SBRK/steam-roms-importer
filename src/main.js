@@ -1,4 +1,3 @@
-
 import { getUserConfigDirectory } from './user-config';
 import loadConsoles from './service/console-loader';
 import { getSteamConfigPath, loadShortcutsFile, generateShortcuts } from './service/shortcuts-loader';

@@ -156,5 +156,5 @@ const findGridImages = async (games, steamConfigPath) => each(games, async (game
   }
 });
 
-export { findGridImages };
+export { findGridImages, findGridImage };
 export default findGridImages;

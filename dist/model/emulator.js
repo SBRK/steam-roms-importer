@@ -68,4 +68,3 @@ var Emulator = function () {
 }();
 
 exports.default = Emulator;
-//# sourceMappingURL=emulator.js.map

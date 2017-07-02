@@ -44,11 +44,14 @@ export async function generateShortcuts(consoles, shortcutsFile) {
 
         if (!game.ignore) {
           const shortcut = shortcutsFile.addShortcut(gameShortcut);
+          const appid = shortcut.getAppID();
+
+          console.log(`Added game "${game.cleanName}" (${gameConsole.name}) to Steam shortcuts with APP ID ${appid}`);
 
           games.push({
             gameName: game.cleanName,
             consoleName: gameConsole.name,
-            appid: shortcut.getAppID(),
+            appid,
           });
         }
       });
@@ -56,6 +59,7 @@ export async function generateShortcuts(consoles, shortcutsFile) {
   });
 
   await shortcutsFile.writeShortcuts();
+  console.log('Shortcuts file saved');
 
   return games;
 }

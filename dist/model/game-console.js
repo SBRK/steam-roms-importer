@@ -14,11 +14,9 @@ var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
-var _keys = require('lodash/keys');
-
-var _keys2 = _interopRequireDefault(_keys);
-
 var _index = require('./index');
+
+var _util = require('../util');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -44,15 +42,20 @@ var GameConsole = function () {
     this.romsConfig = {};
 
     if (this.icon && this.icon.length) {
-      var configPath = _path2.default.join(__dirname, 'config', 'icons');
+      var iconsPath = _path2.default.join(this.getConfigPath(), 'icons');
 
-      this.icon = _path2.default.resolve(configPath, _path2.default.normalize(this.icon));
+      this.icon = _path2.default.resolve(iconsPath, _path2.default.normalize(this.icon));
     }
 
     this.loadRomsConfig();
   }
 
   _createClass(GameConsole, [{
+    key: 'getConfigPath',
+    value: function getConfigPath() {
+      return _path2.default.resolve(_path2.default.join(__dirname, '../', 'config'));
+    }
+  }, {
     key: 'updateFromUserJsonFile',
     value: function updateFromUserJsonFile(jsonFilePath) {
       var jsonData = JSON.parse(_fs2.default.readFileSync(jsonFilePath));
@@ -66,10 +69,10 @@ var GameConsole = function () {
       this.extensions = jsonData.extensions || this.extensions;
       this.emulator = jsonData.emulator || this.emulator;
 
-      if (this.icon && this.icon.length) {
-        var configPath = _path2.default.join(__dirname, 'config', 'icons');
+      if (this.icon && this.icon === jsonData.icon) {
+        var iconsPath = _path2.default.join(this.getConfigPath(), 'icons');
 
-        this.icon = _path2.default.resolve(configPath, _path2.default.normalize(this.icon));
+        this.icon = _path2.default.resolve(iconsPath, _path2.default.normalize(this.icon));
       }
     }
   }, {
@@ -98,7 +101,7 @@ var GameConsole = function () {
   }, {
     key: 'getEmulator',
     value: function getEmulator() {
-      var emulatorNames = (0, _keys2.default)(this.emulators);
+      var emulatorNames = (0, _util.keys)(this.emulators);
 
       if (!emulatorNames.length) return null;
       if (!this.emulator) return this.emulators[emulatorNames[0]];
@@ -121,7 +124,7 @@ var GameConsole = function () {
 
       var p = _path2.default.join(global.USER_CONFIG_DIR, 'consoles', fileName);
 
-      if ((0, _keys2.default)(this.romsConfig).length) _fs2.default.writeFileSync(p, JSON.stringify(this.romsConfig, null, 2));
+      if ((0, _util.keys)(this.romsConfig).length) _fs2.default.writeFileSync(p, JSON.stringify(this.romsConfig, null, 2));
     }
   }, {
     key: 'getRomConfig',
@@ -151,73 +154,33 @@ var GameConsole = function () {
   }, {
     key: 'searchGames',
     value: function searchGames() {
+      var _this = this;
+
       var games = [];
 
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
+      (0, _util.each)(this.romPaths, function (romPath) {
+        var romDir = _path2.default.normalize(romPath);
 
-      try {
-        for (var _iterator = this.romPaths[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var dir = _step.value;
+        if (!_fs2.default.existsSync(romDir)) {
+          console.error('Directory does not exist: ' + romDir);
+        } else {
+          var entries = _fs2.default.readdirSync(romDir);
 
-          dir = _path2.default.normalize(dir);
+          (0, _util.each)(entries, function (entry) {
+            var p = _path2.default.join(romDir, entry);
+            var s = _fs2.default.statSync(p);
 
-          if (_fs2.default.existsSync(dir)) {
-            console.error('Directory does not exist: ' + dir);
-          } else {
-            var entries = _fs2.default.readdirSync(dir);
+            if (s.isFile()) {
+              var ext = _path2.default.extname(entry).replace(/^\./, '');
 
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
-
-            try {
-              for (var _iterator2 = entries[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                var entry = _step2.value;
-
-                var p = _path2.default.join(dir, entry);
-                var s = _fs2.default.statSync(p);
-
-                if (s.isFile()) {
-                  var ext = _path2.default.extname(entry).replace(/^\./, '');
-
-                  if (this.extensions.indexOf(ext) !== -1) {
-                    var gameConfig = this.getRomConfig(entry);
-                    games.push(new _index.Game(this, p, gameConfig));
-                  }
-                }
-              }
-            } catch (err) {
-              _didIteratorError2 = true;
-              _iteratorError2 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                  _iterator2.return();
-                }
-              } finally {
-                if (_didIteratorError2) {
-                  throw _iteratorError2;
-                }
+              if (_this.extensions.includes(ext)) {
+                var gameConfig = _this.getRomConfig(entry);
+                games.push(new _index.Game(_this, p, gameConfig));
               }
             }
-          }
+          });
         }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
+      });
 
       this.games = games;
 
@@ -229,4 +192,3 @@ var GameConsole = function () {
 }();
 
 exports.default = GameConsole;
-//# sourceMappingURL=game-console.js.map
