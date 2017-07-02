@@ -2,7 +2,11 @@
   "name": "steam-roms-importer",
   "author": "Benjamin Michel",
   "description": "Easily make your roms available as shortcuts in Steam.",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SBRK/steam-roms-importer.git"
+  },
   "scripts": {
     "dev": "nodemon --exec babel-node ./src/main.js",
     "build": "rimraf dist && babel src --out-dir dist --copy-files",

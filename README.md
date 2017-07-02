@@ -13,7 +13,7 @@ In the `consoles` folder, you will find configuration files for consoles. In eac
 
 ```
 {
-	"romPaths": ["D:/Roms/SNES", "C:/Roms/SNES"]
+  "romPaths": ["D:/Roms/SNES", "C:/Roms/SNES"]
 }
 ```
 
@@ -21,8 +21,8 @@ In the `emulators` folder, you will find configuration files for emulators. In e
 
 ```
 {
-    "exe": "D:/Emulators/Dolphin/Dolphin.exe",
-    "command": "{exe} /e {game} /b"
+  "exe": "D:/Emulators/Dolphin/Dolphin.exe",
+  "command": "{exe} /e {game} /b"
 }
 ```
 
