@@ -1,10 +1,10 @@
 {
-    "name": "Nintendo 64",
-    "shortName": "N64", 
-    "tags": ["N64"],
-    "prefix": "[N64]", 
-    "icon": "n64.png",
-    "extensions": ["z64", "n64", "zip"],
-    "romPaths": [],
-    "emulator": "project64"
+  "name": "Nintendo 64",
+  "shortName": "N64",
+  "tags": ["N64"],
+  "prefix": "[N64]",
+  "icon": "n64.png",
+  "extensions": ["z64", "n64", "zip"],
+  "romPaths": [],
+  "emulator": "project64"
 }

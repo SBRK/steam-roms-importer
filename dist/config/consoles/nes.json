@@ -1,10 +1,10 @@
 {
-    "name": "NES",
-    "shortName": "NES", 
-    "tags": ["NES"],
-    "prefix": "[NES]", 
-    "icon": "nes.png",
-    "extensions": ["nes", "nez"],
-    "romPaths": [],
-    "emulator": ""
+  "name": "NES",
+  "shortName": "NES",
+  "tags": ["NES"],
+  "prefix": "[NES]",
+  "icon": "nes.png",
+  "extensions": ["nes", "nez"],
+  "romPaths": [],
+  "emulator": ""
 }
