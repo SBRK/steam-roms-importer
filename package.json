@@ -9,9 +9,9 @@
   },
   "scripts": {
     "dev": "nodemon --exec babel-node ./src/main.js",
+    "start": "electron -r babel-register ./src/gui",
     "build": "rimraf dist && babel src --out-dir dist --copy-files",
-    "prepublish": "npm run build",
-    "start": "node ./dist/main.js",
+    "start-script": "node ./dist/main.js",
     "lint": "eslint ./src",
     "lint-fix": "eslint ./src --fix"
   },
@@ -19,25 +19,39 @@
     "steam-roms-importer": "./bin/cli.js"
   },
   "dependencies": {
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-register": "^6.3.13",
     "bluebird": "^3.5.0",
     "colors": "^1.1.2",
+    "electron": "^1.4.3",
     "lodash": "^4.17.2",
     "node-steam-shortcuts": "^1.1.0",
     "path": "^0.12.7",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-redux": "^5.0.5",
+    "redux": "^3.7.1",
+    "redux-actions": "^2.2.1",
+    "redux-thunk": "^2.2.0",
     "request": "^2.81.0",
     "superagent": "^2.3.0",
+    "webpage": "^0.3.0",
     "winreg": "^1.2.4"
   },
   "devDependencies": {
-    "babel-cli": "^6.18.0",
-    "babel-preset-es2015": "^6.18.0",
+    "babel-cli": "^6.24.1",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^15.0.1",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^5.0.1",
     "eslint-plugin-react": "^7.0.1",
     "nodemon": "^1.11.0",
-    "rimraf": "^2.6.1"
+    "rimraf": "^2.6.1",
+    "webpack": "^3.1.0"
   },
-  "license": "GPLv3"
+  "license": "GPLv3",
+  "false": {}
 }
