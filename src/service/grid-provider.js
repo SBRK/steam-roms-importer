@@ -17,6 +17,18 @@ const cleanName = (name) => {
   return gameName;
 };
 
+const localGridImage = async (gameName, consoleName, romFilePath) => {
+  const gridImagePath = romFilePath.replace(/\.[^/.]+$/, '.png');
+  const images = [];
+  if (fs.existsSync(gridImagePath)) {
+    images.push({
+      image: gridImagePath,
+      thumbnail: gridImagePath,
+    });
+  }
+  return images;
+};
+
 const searchSteamGridDB = async (gameName) => {
   const game = cleanName(gameName);
   const url = `http://www.steamgriddb.com/search.php?name=${encodeURIComponent(game)}`;
@@ -110,16 +122,17 @@ const searchConsoleGridDB = async (gameName, consoleName) => {
 };
 
 const gridProviders = [
+  localGridImage,
   searchSteamGridDB,
   searchConsoleGridDB,
 ];
 
-const findGridImage = async (gameName, consoleName = '') => {
+const findGridImage = async (gameName, consoleName = '', romFilePath = '') => {
   let images = [];
 
   await each(gridProviders, async (searchFunction) => {
     try {
-      const foundImages = await searchFunction(gameName, consoleName);
+      const foundImages = await searchFunction(gameName, consoleName, romFilePath);
       images = images.concat(foundImages);
     } catch (e) {
     }
@@ -130,11 +143,11 @@ const findGridImage = async (gameName, consoleName = '') => {
 
 const findGridImages = async (games, steamConfigPath) => {
   console.log('');
-  console.log(`Searching for grid images for ${games.length.toString().green} games`)
+  console.log(`Searching for grid images for ${games.length.toString().green} games`);
   console.log('');
 
   await each(games, async (game) => {
-    const { gameName, consoleName, appid } = game;
+    const { gameName, consoleName, appid, romFilePath } = game;
 
     const gridPath = path.join(steamConfigPath, 'grid');
     const filePath = path.join(gridPath, `${appid}.png`);
@@ -142,15 +155,24 @@ const findGridImages = async (games, steamConfigPath) => {
     if (!fs.existsSync(gridPath)) fs.mkdirSync(gridPath);
 
     if (!fs.existsSync(filePath)) {
-      const images = await findGridImage(gameName, consoleName);
+      const images = await findGridImage(gameName, consoleName, romFilePath);
       let foundImages = false;
 
       if (images && images.length) {
         try {
-          const response = await request.get(images[0].image);
-          response.pipe(fs.createWriteStream(filePath));
+          if (images[0].image.indexOf('http') === 0) {
+            // remote read
+            const response = await request.get(images[0].image);
+            response.pipe(fs.createWriteStream(filePath));
 
-          foundImages = true;
+            foundImages = true;
+          } else {
+            // local read
+            const localFileContents = fs.readFileSync(images[0].image);
+            fs.writeFileSync(filePath, localFileContents);
+
+            foundImages = true;
+          }
         } catch (err) {
           foundImages = false;
         }
@@ -164,7 +186,7 @@ const findGridImages = async (games, steamConfigPath) => {
   });
 
   console.log('');
-}
+};
 
 export { findGridImages, findGridImage };
 export default findGridImages;
