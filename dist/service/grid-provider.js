@@ -35,6 +35,18 @@ var cleanName = function cleanName(name) {
   return gameName;
 };
 
+var localGridImage = async function localGridImage(gameName, consoleName, romFilePath) {
+  var gridImagePath = romFilePath.replace(/\.[^/.]+$/, '.png');
+  var images = [];
+  if (_fs2.default.existsSync(gridImagePath)) {
+    images.push({
+      image: gridImagePath,
+      thumbnail: gridImagePath
+    });
+  }
+  return images;
+};
+
 var searchSteamGridDB = async function searchSteamGridDB(gameName) {
   var game = cleanName(gameName);
   var url = 'http://www.steamgriddb.com/search.php?name=' + encodeURIComponent(game);
@@ -123,16 +135,17 @@ var searchConsoleGridDB = async function searchConsoleGridDB(gameName, consoleNa
   return images;
 };
 
-var gridProviders = [searchSteamGridDB, searchConsoleGridDB];
+var gridProviders = [localGridImage, searchSteamGridDB, searchConsoleGridDB];
 
 var findGridImage = async function findGridImage(gameName) {
   var consoleName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+  var romFilePath = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
 
   var images = [];
 
   await (0, _util.each)(gridProviders, async function (searchFunction) {
     try {
-      var foundImages = await searchFunction(gameName, consoleName);
+      var foundImages = await searchFunction(gameName, consoleName, romFilePath);
       images = images.concat(foundImages);
     } catch (e) {}
   });
@@ -148,7 +161,8 @@ var findGridImages = async function findGridImages(games, steamConfigPath) {
   await (0, _util.each)(games, async function (game) {
     var gameName = game.gameName,
         consoleName = game.consoleName,
-        appid = game.appid;
+        appid = game.appid,
+        romFilePath = game.romFilePath;
 
 
     var gridPath = _path2.default.join(steamConfigPath, 'grid');
@@ -157,15 +171,24 @@ var findGridImages = async function findGridImages(games, steamConfigPath) {
     if (!_fs2.default.existsSync(gridPath)) _fs2.default.mkdirSync(gridPath);
 
     if (!_fs2.default.existsSync(filePath)) {
-      var images = await findGridImage(gameName, consoleName);
+      var images = await findGridImage(gameName, consoleName, romFilePath);
       var foundImages = false;
 
       if (images && images.length) {
         try {
-          var response = await _request2.default.get(images[0].image);
-          response.pipe(_fs2.default.createWriteStream(filePath));
+          if (images[0].image.indexOf('http') === 0) {
+            // remote read
+            var response = await _request2.default.get(images[0].image);
+            response.pipe(_fs2.default.createWriteStream(filePath));
 
-          foundImages = true;
+            foundImages = true;
+          } else {
+            // local read
+            var localFileContents = _fs2.default.readFileSync(images[0].image);
+            _fs2.default.writeFileSync(filePath, localFileContents);
+
+            foundImages = true;
+          }
         } catch (err) {
           foundImages = false;
         }

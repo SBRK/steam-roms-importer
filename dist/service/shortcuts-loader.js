@@ -74,6 +74,7 @@ async function generateShortcuts(consoles, shortcutsFile) {
             console.log('    ' + '+'.green + ' Added game ' + game.cleanName.bgBlack.white + ' with APP ID ' + appid.grey);
 
             games.push({
+              romFilePath: game.filePath,
               gameName: game.cleanName,
               consoleName: gameConsole.name,
               appid: appid

@@ -28,6 +28,10 @@ In the `emulators` folder, you will find configuration files for emulators. In e
 
 Once you changed all of your console and emulator config files, run the script again with `steam-roms-importer` and you should see the games being added to the Steam shortcut file. Restart Steam to see them in your library.
 
+### Note on Grid Images
+
+Grid images are retrieved locally or from remote sources if not found locally. In order to use a locally stored grid image, simply create it as a .png with the same exact name as your rom and in the same directory.
+
 ## Running in dev
 
 First of all, install the dependencies:
