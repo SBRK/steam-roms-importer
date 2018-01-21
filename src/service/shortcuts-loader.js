@@ -57,6 +57,7 @@ export async function generateShortcuts(consoles, shortcutsFile) {
             console.log(`    ${'+'.green} Added game ${game.cleanName.bgBlack.white} with APP ID ${appid.grey}`);
 
             games.push({
+              romFilePath: game.filePath,
               gameName: game.cleanName,
               consoleName: gameConsole.name,
               appid,
@@ -77,7 +78,7 @@ export async function generateShortcuts(consoles, shortcutsFile) {
 
   await shortcutsFile.writeShortcuts();
   console.log(`** Shortcuts file saved, ${games.length.toString().green} games added ! **`.bgBlue);
-  console.log('')
+  console.log('');
 
   return games;
 }
